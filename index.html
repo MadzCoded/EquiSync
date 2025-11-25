@@ -831,3 +831,490 @@
       if (years < 0) return "";
       if (years === 0) {
         const months = (today.getFullYear() - birthDate.getFullYear()) * 12 + m;
+        if (months <= 0) return "Foal";
+        return months + " mo";
+      }
+      return years + " yr";
+    }
+
+    function updateAgeDisplay() {
+      ageDisplayInput.value = calculateAgeDisplay(birthdayInput.value.trim());
+    }
+
+    birthdayInput.addEventListener("change", updateAgeDisplay);
+
+    function convertHorseRealityDateToInput(value) {
+      if (!value) return "";
+      const parts = value.trim().split("-");
+      if (parts.length !== 3) return "";
+      const [day, month, year] = parts;
+      if (!year || !month || !day) return "";
+      return \`\${year.padStart(4, "0")}-\${month.padStart(2, "0")}-\${day.padStart(2, "0")}\`;
+    }
+
+    function getInfoValueFromDoc(doc, labelText) {
+      const rows = doc.querySelectorAll(".info_table_row");
+      const target = labelText.trim().toLowerCase();
+
+      for (const row of rows) {
+        const labelEl = row.querySelector(".info_label");
+        if (!labelEl) continue;
+        const label = labelEl.textContent.trim().toLowerCase();
+        if (label === target) {
+          const item = row.querySelector(".info_item");
+          if (item) return item.textContent.trim();
+        }
+      }
+      return "";
+    }
+
+    function getSexFromDoc(doc) {
+      const sexEl = doc.querySelector("p#sex");
+      if (!sexEl) return "";
+
+      const lower = sexEl.textContent.toLowerCase();
+      if (lower.includes("gelding")) return "Gelding";
+      if (lower.includes("stallion")) return "Stallion";
+      if (lower.includes("mare")) return "Mare";
+      return "";
+    }
+
+    function getBreedFromDoc(doc) {
+      const breedEl = doc.querySelector("p#breed");
+      if (!breedEl) return "";
+      return breedEl.textContent.trim();
+    }
+
+    async function importHorseFromUrl() {
+      const url = importUrlInput.value.trim();
+      if (!url) {
+        alert("Please paste a horse URL from Horse Reality first.");
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = new URL(url);
+      } catch (e) {
+        alert("That doesn't look like a valid URL.");
+        return;
+      }
+
+      if (!parsed.hostname.includes("horsereality.com")) {
+        alert("This importer only works with horsereality.com URLs.");
+        return;
+      }
+
+      try {
+        const response = await fetch(url, { credentials: "include" });
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        const data = {
+          name: getInfoValueFromDoc(doc, "Name"),
+          lifenumber: getInfoValueFromDoc(doc, "Lifenumber"),
+          birthdayText: getInfoValueFromDoc(doc, "Birthday"),
+          owner: getInfoValueFromDoc(doc, "Owner"),
+          breeder: getInfoValueFromDoc(doc, "Breeder"),
+          location: getInfoValueFromDoc(doc, "Location"),
+          sex: getSexFromDoc(doc),
+          breed: getBreedFromDoc(doc)
+        };
+
+        if (!data.name) {
+          alert("Could not read this horse's page. Horse Reality might have changed their layout or blocked access.");
+          return;
+        }
+
+        lifeNumberInput.value = data.lifenumber || "";
+        nameInput.value = data.name || "";
+        sexInput.value = data.sex || "";
+        breedInput.value = data.breed || "";
+        ownerInput.value = data.owner || "";
+        breederInput.value = data.breeder || "";
+        locationInput.value = data.location || "";
+
+        if (data.birthdayText) {
+          const converted = convertHorseRealityDateToInput(data.birthdayText);
+          birthdayInput.value = converted;
+        }
+
+        updateAgeDisplay();
+        nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        nameInput.focus();
+
+        console.log("[EquiSync] Imported from URL:", url, data);
+      } catch (err) {
+        console.error("[EquiSync] Import failed:", err);
+        alert(
+          "Could not import this horse. Your browser may be blocking cross-site requests (CORS), " +
+          "or you might not be logged in to Horse Reality in this browser."
+        );
+      }
+    }
+
+    function getStableLabel(horse) {
+      if (horse.stable && horse.stable !== "Custom") return horse.stable;
+      if (horse.stable === "Custom" && horse.stableCustom) return horse.stableCustom;
+      return "";
+    }
+
+    function resetForm() {
+      form.reset();
+      editingId = null;
+      horseIdInput.value = "";
+      ageDisplayInput.value = "";
+      GP_FIELDS.forEach(key => {
+        const input = document.getElementById(\`gp-\${key}\`);
+        if (input) input.value = "";
+      });
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(\`conf-\${key}\`);
+        if (sel) sel.value = "";
+      });
+      document.getElementById("submit-btn").textContent = "Add horse";
+    }
+
+    function populateForm(horse) {
+      horseIdInput.value = horse.id;
+      lifeNumberInput.value = horse.lifeNumber || "";
+      nameInput.value = horse.name || "";
+      sexInput.value = horse.sex || "";
+      breedInput.value = horse.breed || "";
+      birthdayInput.value = horse.birthday || "";
+      ageDisplayInput.value = calculateAgeDisplay(horse.birthday || "");
+      ownerInput.value = horse.owner || "";
+      breederInput.value = horse.breeder || "";
+      locationInput.value = horse.location || "";
+      colourPatternInput.value = horse.colourPattern || "";
+      stableSelect.value = horse.stable || "";
+      stableCustomInput.value = horse.stableCustom || "";
+      disciplineInput.value = horse.discipline || "";
+      priorityInput.value = horse.priority || "";
+      portraitUrlInput.value = horse.portraitUrl || "";
+      foalUrlInput.value = horse.foalUrl || "";
+      goalsInput.value = horse.goals || "";
+      sireInput.value = horse.sire || "";
+      damInput.value = horse.dam || "";
+      pedigreeNotesInput.value = horse.pedigreeNotes || "";
+      foalsNotesInput.value = horse.foalsNotes || "";
+
+      const gp = horse.gp || {};
+      GP_FIELDS.forEach(key => {
+        const input = document.getElementById(\`gp-\${key}\`);
+        if (input) input.value = gp[key] ?? "";
+      });
+
+      const conf = horse.conformation || {};
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(\`conf-\${key}\`);
+        if (sel) sel.value = conf[key] || "";
+      });
+
+      editingId = horse.id;
+      document.getElementById("submit-btn").textContent = "Save changes";
+      nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      nameInput.focus();
+    }
+
+    function priorityRank(priority) {
+      const p = (priority || "").toLowerCase();
+      if (p === "high") return 0;
+      if (p === "low") return 2;
+      return 1;
+    }
+
+    function updateSummary(filteredCount) {
+      const total = horses.length;
+      const high = horses.filter(h => (h.priority || "").toLowerCase() === "high").length;
+
+      if (total === 0) {
+        summaryEl.textContent = "No horses yet.";
+        return;
+      }
+
+      let text = \`\${filteredCount} of \${total} horses shown\`;
+      if (high > 0) text += \` • \${high} high priority\`;
+      summaryEl.textContent = text;
+    }
+
+    function renderHorses() {
+      const filter = filterInput.value.trim().toLowerCase();
+      const sortBy = sortBySelect.value;
+      listEl.innerHTML = "";
+
+      let filtered = horses.filter((h) => {
+        if (!filter) return true;
+        const stableLabel = getStableLabel(h);
+        return [
+          h.name, h.breed, h.lifeNumber, h.location, stableLabel,
+          h.owner, h.sex
+        ].some(v => (v || "").toLowerCase().includes(filter));
+      });
+
+      if (filtered.length === 0) {
+        emptyStateEl.style.display = "block";
+        updateSummary(0);
+        return;
+      } else {
+        emptyStateEl.style.display = "none";
+      }
+
+      filtered = filtered.slice().sort((a, b) => {
+        if (sortBy === "name") {
+          return (a.name || "").localeCompare(b.name || "");
+        }
+        if (sortBy === "targetDate") {
+          return (a.birthday || "").localeCompare(b.birthday || "");
+        }
+        const ra = priorityRank(a.priority);
+        const rb = priorityRank(b.priority);
+        if (ra !== rb) return ra - rb;
+        return (a.name || "").localeCompare(b.name || "");
+      });
+
+      updateSummary(filtered.length);
+
+      filtered.forEach((horse) => {
+        const card = document.createElement("div");
+        card.className = "horse-card";
+
+        const avatarWrapper = document.createElement("div");
+        avatarWrapper.className = "horse-avatar-wrapper";
+
+        const avatar = document.createElement("div");
+        avatar.className = "horse-avatar";
+
+        if (horse.portraitUrl) {
+          const img = document.createElement("img");
+          img.src = horse.portraitUrl;
+          img.alt = horse.name || "Horse portrait";
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = (horse.name || "?").charAt(0).toUpperCase();
+        }
+
+        if (horse.foalUrl) {
+          const foal = document.createElement("div");
+          foal.className = "foal-badge";
+          const fi = document.createElement("img");
+          fi.src = horse.foalUrl;
+          fi.alt = "Foal";
+          foal.appendChild(fi);
+          avatar.appendChild(foal);
+        }
+
+        avatarWrapper.appendChild(avatar);
+        card.appendChild(avatarWrapper);
+
+        const main = document.createElement("div");
+        main.className = "horse-main";
+
+        const topRow = document.createElement("div");
+        topRow.className = "horse-top-row";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "horse-name";
+        nameEl.textContent = horse.name || "Unnamed horse";
+        topRow.appendChild(nameEl);
+
+        const stableLabel = getStableLabel(horse);
+        if (stableLabel) {
+          const stablePill = document.createElement("span");
+          stablePill.className = "stable-pill";
+          stablePill.textContent = stableLabel;
+          topRow.appendChild(stablePill);
+        }
+
+        const p = (horse.priority || "").toLowerCase();
+        const pill = document.createElement("span");
+        pill.className = "priority-pill";
+        if (p === "high") {
+          pill.classList.add("priority-high");
+          pill.textContent = "High priority";
+        } else if (p === "low") {
+          pill.classList.add("priority-low");
+          pill.textContent = "Low priority";
+        } else {
+          pill.classList.add("priority-normal");
+          pill.textContent = "Normal";
+        }
+        topRow.appendChild(pill);
+
+        const metaEl = document.createElement("div");
+        metaEl.className = "horse-meta";
+        const bits = [];
+        if (horse.lifeNumber) bits.push(horse.lifeNumber);
+        if (horse.sex) bits.push(horse.sex);
+        if (horse.breed) bits.push(horse.breed);
+        const ageText = calculateAgeDisplay(horse.birthday || "");
+        if (ageText) bits.push(ageText);
+        metaEl.textContent = bits.join(" • ");
+
+        const submetaEl = document.createElement("div");
+        submetaEl.className = "horse-submeta";
+        const bits2 = [];
+        if (horse.owner) bits2.push("Owner: " + horse.owner);
+        if (horse.location) bits2.push("Location: " + horse.location);
+        if (horse.discipline) bits2.push("Focus: " + horse.discipline);
+        submetaEl.textContent = bits2.join(" • ");
+
+        const goalsEl = document.createElement("div");
+        goalsEl.className = "horse-goals";
+        goalsEl.textContent = horse.goals || "";
+
+        main.appendChild(topRow);
+        if (bits.length > 0) main.appendChild(metaEl);
+        if (bits2.length > 0) main.appendChild(submetaEl);
+        if (horse.goals) main.appendChild(goalsEl);
+
+        card.appendChild(main);
+
+        const actions = document.createElement("div");
+        actions.className = "horse-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn-secondary";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => populateForm(horse));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-danger";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => {
+          if (!confirm(\`Delete \${horse.name || "this horse"}?\`)) return;
+          horses = horses.filter((h) => h.id !== horse.id);
+          saveHorses(horses);
+          renderHorses();
+          if (editingId === horse.id) {
+            resetForm();
+          }
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(actions);
+
+        listEl.appendChild(card);
+      });
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert("Please enter a horse name.");
+        return;
+      }
+
+      const gp = {};
+      GP_FIELDS.forEach(key => {
+        const input = document.getElementById(\`gp-\${key}\`);
+        if (!input) return;
+        const v = input.value.trim();
+        gp[key] = v === "" ? null : Number(v);
+      });
+
+      const conformation = {};
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(\`conf-\${key}\`);
+        if (!sel) return;
+        conformation[key] = sel.value;
+      });
+
+      const horseData = {
+        id: editingId || String(Date.now()),
+        lifeNumber: lifeNumberInput.value.trim(),
+        name,
+        sex: sexInput.value,
+        breed: breedInput.value.trim(),
+        birthday: birthdayInput.value,
+        owner: ownerInput.value.trim(),
+        breeder: breederInput.value.trim(),
+        location: locationInput.value.trim(),
+        colourPattern: colourPatternInput.value.trim(),
+        stable: stableSelect.value,
+        stableCustom: stableCustomInput.value.trim(),
+        discipline: disciplineInput.value.trim(),
+        priority: priorityInput.value,
+        portraitUrl: portraitUrlInput.value.trim(),
+        foalUrl: foalUrlInput.value.trim(),
+        goals: goalsInput.value.trim(),
+        gp,
+        conformation,
+        sire: sireInput.value.trim(),
+        dam: damInput.value.trim(),
+        pedigreeNotes: pedigreeNotesInput.value.trim(),
+        foalsNotes: foalsNotesInput.value.trim()
+      };
+
+      if (editingId) {
+        horses = horses.map((h) => (h.id === editingId ? horseData : h));
+      } else {
+        horses.push(horseData);
+      }
+
+      saveHorses(horses);
+      renderHorses();
+      resetForm();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      resetForm();
+    });
+
+    filterInput.addEventListener("input", () => {
+      renderHorses();
+    });
+
+    sortBySelect.addEventListener("change", () => {
+      renderHorses();
+    });
+
+    importUrlBtn.addEventListener("click", () => {
+      importHorseFromUrl();
+    });
+
+    importUrlInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        importHorseFromUrl();
+      }
+    });
+
+    function applyNameFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const incomingName = params.get("name");
+        if (!incomingName) return;
+        nameInput.value = incomingName;
+        nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        nameInput.focus();
+      } catch (e) {
+        console.error("Failed to read name from URL", e);
+      }
+    }
+
+    function applySexFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const incomingSex = params.get("sex");
+      if (!incomingSex) return;
+
+      const sexField = document.getElementById("sex");
+      if (sexField) {
+        sexField.value = incomingSex;
+      }
+    }
+
+    updateAgeDisplay();
+    renderHorses();
+    applyNameFromUrl();
+    applySexFromUrl();
+  </script>
+</body>
+</html>
