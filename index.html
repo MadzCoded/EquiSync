@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EquiSync – Stable Tracker for Horse Reality</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top left, #4f46e5, #111827 55%, #020617);
+      --accent: #f97316;
+      --accent-soft: rgba(249, 115, 22, 0.15);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --border-subtle: rgba(148, 163, 184, 0.25);
+      --blur-radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Inter", "Segoe UI", sans-serif;
+      background:
+        var(--bg-gradient),
+        #020617 no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background overlay for readability */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.2), transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.18), transparent 55%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      opacity: 0.05;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      margin-inline: auto;
+    }
+
+    .card {
+      border-radius: 1.75rem;
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.92),
+        rgba(15, 23, 42, 0.72)
+      );
+      backdrop-filter: blur(var(--blur-radius));
+      box-shadow:
+        0 22px 60px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.9);
+      padding: 2.1rem 2.25rem 2.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 2.6rem 2.8rem 2.8rem;
+      }
+    }
+
+    .halo {
+      position: absolute;
+      inset: -1px;
+      background:
+        radial-gradient(circle at 0% 0%, var(--accent-soft), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.1), transparent 55%);
+      mix-blend-mode: screen;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(249, 115, 22, 0.4);
+      background: rgba(15, 23, 42, 0.85);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle, var(--accent) 0%, #facc15 40%, transparent 100%);
+      box-shadow: 0 0 12px rgba(248, 250, 252, 0.5);
+    }
+
+    h1 {
+      font-size: clamp(2.35rem, 4vw, 3rem);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .title-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .title-main {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .accent-gradient {
+      background: linear-gradient(135deg, #f97316, #facc15);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.98rem;
+      max-width: 32rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      text-wrap: pretty;
+    }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    .author {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .author span {
+      opacity: 0.9;
+    }
+
+    .author a {
+      position: relative;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 500;
+      padding-bottom: 0.1rem;
+    }
+
+    .author a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 1px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #facc15);
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 180ms ease-out;
+      opacity: 0.85;
+    }
+
+    .author a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .author a:hover {
+      color: var(--accent);
+    }
+
+    .badge {
+      padding: 0.18rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.8);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <main class="shell" aria-labelledby="equisync-title">
+    <section class="card">
+      <div class="halo" aria-hidden="true"></div>
+
+      <div class="card-inner">
+        <div class="pill">
+          <span class="pill-dot"></span>
+          <span>Stable Tracker • Horse Reality</span>
+        </div>
+
+        <header class="title-row">
+          <div class="title-main">
+            <h1 id="equisync-title">
+              <span class="accent-gradient">EquiSync</span>
+            </h1>
+          </div>
+
+          <p class="subtitle">
+            A sleek, focused hub for syncing, viewing, and managing your Horse Reality
+            stables—built for clarity today and ready to grow with your future features.
+          </p>
+        </header>
+
+        <footer class="footer">
+          <div class="author">
+            <span>Crafted by</span>
+            <a href="https://github.com/MadzCoded" target="_blank" rel="noopener noreferrer">
+              MadzCoded
+            </a>
+          </div>
+
+          <div class="badge">
+            <span class="badge-dot"></span>
+            <span>Layout-only preview · No data yet</span>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
