@@ -158,4 +158,517 @@
 
     .horses-header {
       display: flex;
-      fl
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .horses-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .horses-header h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .summary {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .filter-input {
+      max-width: 240px;
+    }
+
+    .toolbar select {
+      max-width: 180px;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.7rem;
+    }
+
+    .horse-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .horse-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 0.8rem 0.95rem;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 600px) {
+      .horse-card {
+        grid-template-columns: 1fr;
+      }
+      .horse-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+    }
+
+    .horse-main {
+      min-width: 0;
+    }
+
+    .horse-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.6rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .horse-name {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .priority-pill {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .priority-high {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .priority-low {
+      background: #ecfdf3;
+      color: #15803d;
+      border-color: #bbf7d0;
+    }
+
+    .priority-normal {
+      background: #e5e7eb;
+      color: #374151;
+      border-color: #d1d5db;
+    }
+
+    .horse-meta {
+      font-size: 0.78rem;
+      color: #6b7280;
+      margin-bottom: 0.2rem;
+    }
+
+    .horse-goals {
+      font-size: 0.86rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 0.15rem;
+    }
+
+    .horse-tags {
+      font-size: 0.78rem;
+      color: #4b5563;
+      margin-top: 0.25rem;
+    }
+
+    .horse-tags span {
+      background: #eef2ff;
+      border-radius: 999px;
+      padding: 0.1rem 0.5rem;
+    }
+
+    .horse-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .horse-actions button {
+      padding: 0.28rem 0.7rem;
+      font-size: 0.78rem;
+      box-shadow: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7280;
+      padding: 1.2rem 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Horse Reality Planner</h1>
+      <p class="subtitle">Track your horses, goals and plans (saved locally in your browser).</p>
+    </header>
+
+    <!-- Add / edit horse -->
+    <section class="card">
+      <form id="horse-form">
+        <input type="hidden" id="horse-id" />
+
+        <label>
+          Horse name
+          <input type="text" id="name" required placeholder="e.g. Starfire" />
+        </label>
+
+        <label>
+          Breed
+          <input type="text" id="breed" placeholder="e.g. Thoroughbred" />
+        </label>
+
+        <label>
+          Discipline / focus
+          <input type="text" id="discipline" placeholder="e.g. Dressage, Breeding, Training" />
+        </label>
+
+        <label>
+          Priority
+          <select id="priority">
+            <option value="">Normal</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+          </select>
+        </label>
+
+        <label class="full-width">
+          Main goals / notes
+          <textarea id="goals" placeholder="- Train stats
+- Plan breeding
+- Competition schedule"></textarea>
+        </label>
+
+        <div class="field-row">
+          <label>
+            Target date
+            <input type="date" id="targetDate" />
+          </label>
+
+          <label>
+            Tag / stable
+            <input type="text" id="tag" placeholder="e.g. Broodmare, Foal, Show string" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-secondary" id="clear-btn">Clear</button>
+          <button type="submit" class="btn-primary" id="submit-btn">Add horse</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- List of horses -->
+    <section>
+      <div class="horses-header">
+        <div class="horses-header-left">
+          <h2>Your horses</h2>
+          <div id="summary" class="summary">No horses yet.</div>
+        </div>
+        <div class="toolbar">
+          <select id="sortBy">
+            <option value="priority">Sort by: Priority</option>
+            <option value="name">Sort by: Name</option>
+            <option value="targetDate">Sort by: Target date</option>
+          </select>
+          <input
+            type="text"
+            id="filter"
+            class="filter-input"
+            placeholder="Filter by name, tag, breed..."
+          />
+        </div>
+      </div>
+      <div id="horse-list" class="horse-list"></div>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        No horses yet. Add your first horse above 🐴
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "horseRealityPlannerV1";
+
+    function loadHorses() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error("Error loading horses", e);
+        return [];
+      }
+    }
+
+    function saveHorses(horses) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(horses));
+    }
+
+    let horses = loadHorses();
+    let editingId = null;
+
+    const form = document.getElementById("horse-form");
+    const horseIdInput = document.getElementById("horse-id");
+    const nameInput = document.getElementById("name");
+    const breedInput = document.getElementById("breed");
+    const disciplineInput = document.getElementById("discipline");
+    const priorityInput = document.getElementById("priority");
+    const goalsInput = document.getElementById("goals");
+    const targetDateInput = document.getElementById("targetDate");
+    const tagInput = document.getElementById("tag");
+    const submitBtn = document.getElementById("submit-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const filterInput = document.getElementById("filter");
+    const sortBySelect = document.getElementById("sortBy");
+    const listEl = document.getElementById("horse-list");
+    const emptyStateEl = document.getElementById("empty-state");
+    const summaryEl = document.getElementById("summary");
+
+    function resetForm() {
+      form.reset();
+      editingId = null;
+      horseIdInput.value = "";
+      submitBtn.textContent = "Add horse";
+    }
+
+    function populateForm(horse) {
+      horseIdInput.value = horse.id;
+      nameInput.value = horse.name || "";
+      breedInput.value = horse.breed || "";
+      disciplineInput.value = horse.discipline || "";
+      priorityInput.value = horse.priority || "";
+      goalsInput.value = horse.goals || "";
+      targetDateInput.value = horse.targetDate || "";
+      tagInput.value = horse.tag || "";
+      editingId = horse.id;
+      submitBtn.textContent = "Save changes";
+      nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      nameInput.focus();
+    }
+
+    function priorityRank(priority) {
+      const p = (priority || "").toLowerCase();
+      if (p === "high") return 0;
+      if (p === "low") return 2;
+      return 1; // normal/empty
+    }
+
+    function updateSummary(filteredCount) {
+      const total = horses.length;
+      const high = horses.filter(h => (h.priority || "").toLowerCase() === "high").length;
+
+      if (total === 0) {
+        summaryEl.textContent = "No horses yet.";
+        return;
+      }
+
+      let text = `${filteredCount} of ${total} horses shown`;
+      if (high > 0) {
+        text += ` • ${high} high priority`;
+      }
+      summaryEl.textContent = text;
+    }
+
+    function renderHorses() {
+      const filter = filterInput.value.trim().toLowerCase();
+      const sortBy = sortBySelect.value;
+      listEl.innerHTML = "";
+
+      let filtered = horses.filter((h) => {
+        if (!filter) return true;
+        return (
+          (h.name || "").toLowerCase().includes(filter) ||
+          (h.breed || "").toLowerCase().includes(filter) ||
+          (h.tag || "").toLowerCase().includes(filter) ||
+          (h.discipline || "").toLowerCase().includes(filter)
+        );
+      });
+
+      if (filtered.length === 0) {
+        emptyStateEl.style.display = "block";
+        updateSummary(0);
+        return;
+      } else {
+        emptyStateEl.style.display = "none";
+      }
+
+      filtered = filtered.slice().sort((a, b) => {
+        if (sortBy === "name") {
+          return (a.name || "").localeCompare(b.name || "");
+        }
+        if (sortBy === "targetDate") {
+          return (a.targetDate || "").localeCompare(b.targetDate || "");
+        }
+        // default: priority
+        const ra = priorityRank(a.priority);
+        const rb = priorityRank(b.priority);
+        if (ra !== rb) return ra - rb;
+        return (a.name || "").localeCompare(b.name || "");
+      });
+
+      updateSummary(filtered.length);
+
+      filtered.forEach((horse) => {
+        const card = document.createElement("div");
+        card.className = "horse-card";
+
+        const main = document.createElement("div");
+        main.className = "horse-main";
+
+        const topRow = document.createElement("div");
+        topRow.className = "horse-top-row";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "horse-name";
+        nameEl.textContent = horse.name || "Unnamed horse";
+
+        topRow.appendChild(nameEl);
+
+        const p = (horse.priority || "").toLowerCase();
+        const pill = document.createElement("span");
+        pill.className = "priority-pill";
+
+        if (p === "high") {
+          pill.classList.add("priority-high");
+          pill.textContent = "High priority";
+        } else if (p === "low") {
+          pill.classList.add("priority-low");
+          pill.textContent = "Low priority";
+        } else {
+          pill.classList.add("priority-normal");
+          pill.textContent = "Normal";
+        }
+        topRow.appendChild(pill);
+
+        const metaEl = document.createElement("div");
+        metaEl.className = "horse-meta";
+
+        const bits = [];
+        if (horse.breed) bits.push(horse.breed);
+        if (horse.discipline) bits.push(horse.discipline);
+        if (horse.targetDate) bits.push("Target: " + horse.targetDate);
+
+        metaEl.textContent = bits.join(" • ");
+
+        const goalsEl = document.createElement("div");
+        goalsEl.className = "horse-goals";
+        goalsEl.textContent = horse.goals || "";
+
+        const tagsEl = document.createElement("div");
+        tagsEl.className = "horse-tags";
+        if (horse.tag) {
+          const span = document.createElement("span");
+          span.textContent = "#" + horse.tag;
+          tagsEl.appendChild(span);
+        }
+
+        main.appendChild(topRow);
+        if (bits.length > 0) main.appendChild(metaEl);
+        if (horse.goals) main.appendChild(goalsEl);
+        if (horse.tag) main.appendChild(tagsEl);
+
+        const actions = document.createElement("div");
+        actions.className = "horse-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn-secondary";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => populateForm(horse));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-danger";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => {
+          if (!confirm(`Delete ${horse.name || "this horse"}?`)) return;
+          horses = horses.filter((h) => h.id !== horse.id);
+          saveHorses(horses);
+          renderHorses();
+          if (editingId === horse.id) {
+            resetForm();
+          }
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(main);
+        card.appendChild(actions);
+
+        listEl.appendChild(card);
+      });
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert("Please enter a horse name.");
+        return;
+      }
+
+      const horseData = {
+        id: editingId || String(Date.now()),
+        name,
+        breed: breedInput.value.trim(),
+        discipline: disciplineInput.value.trim(),
+        priority: priorityInput.value,
+        goals: goalsInput.value.trim(),
+        targetDate: targetDateInput.value,
+        tag: tagInput.value.trim()
+      };
+
+      if (editingId) {
+        horses = horses.map((h) => (h.id === editingId ? horseData : h));
+      } else {
+        horses.push(horseData);
+      }
+
+      saveHorses(horses);
+      renderHorses();
+      resetForm();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      resetForm();
+    });
+
+    filterInput.addEventListener("input", () => {
+      renderHorses();
+    });
+
+    sortBySelect.addEventListener("change", () => {
+      renderHorses();
+    });
+
+    // Initial render
+    renderHorses();
+  </script>
+</body>
+</html>
