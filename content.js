@@ -6,14 +6,6 @@ const BUTTON_ID = "equisync-export-button";
 const PLANNER_URL = "https://madzcoded.github.io/EquiSync/";
 // ==========================
 
-/**
- * Get the horse's name from the "Info" table.
- * Looks for a row:
- * <div class="info_table_row">
- *   <div class="info_label">Name</div>
- *   <div class="info_item">AlleyCat Dunner</div>
- * </div>
- */
 function getHorseNameFromPage() {
   const rows = document.querySelectorAll(".info_table_row");
 
@@ -36,16 +28,6 @@ function getHorseNameFromPage() {
   return null;
 }
 
-/**
- * Get the horse's sex from the summary bar at the top:
- *
- * <p id="sex">
- *   <i class="hr-icon fa-venus"></i>
- *   Mare
- * </p>
- *
- * or Stallion / Gelding
- */
 function getHorseSexFromPage() {
   const sexEl = document.querySelector("p#sex");
   if (!sexEl) {
@@ -53,19 +35,26 @@ function getHorseSexFromPage() {
     return null;
   }
 
-  const text = sexEl.textContent.trim();
-  if (!text) return null;
+  const raw = sexEl.textContent || "";
+  const lower = raw.toLowerCase();
 
-  const normalized = text.replace(/\s+/g, " "); // collapse whitespace
+  if (lower.includes("gelding")) {
+    console.log("[EquiSync] Found horse sex: Gelding");
+    return "Gelding";
+  }
+  if (lower.includes("stallion")) {
+    console.log("[EquiSync] Found horse sex: Stallion");
+    return "Stallion";
+  }
+  if (lower.includes("mare")) {
+    console.log("[EquiSync] Found horse sex: Mare");
+    return "Mare";
+  }
 
-  // We could map here if needed, but HR already uses nice labels
-  console.log("[EquiSync] Found horse sex:", normalized);
-  return normalized;
+  console.log("[EquiSync] Could not normalize sex from text:", raw);
+  return null;
 }
 
-/**
- * Builds the planner URL with all known parameters.
- */
 function buildPlannerUrl(name, sex) {
   const params = new URLSearchParams();
   if (name) params.set("name", name);
@@ -76,18 +65,13 @@ function buildPlannerUrl(name, sex) {
   return url;
 }
 
-/**
- * Creates the floating export button in the bottom-right corner.
- */
 function createExportButton() {
-  // Avoid duplicates if script runs multiple times
   if (document.getElementById(BUTTON_ID)) return;
 
   const btn = document.createElement("button");
   btn.id = BUTTON_ID;
   btn.title = "Send this horse to EquiSync";
 
-  // Little round icon button
   btn.textContent = "🐴";
   btn.style.position = "fixed";
   btn.style.bottom = "16px";
@@ -114,7 +98,6 @@ function createExportButton() {
     let name = getHorseNameFromPage();
 
     if (!name) {
-      // Fallback: ask user to type it
       const manual = window.prompt(
         "EquiSync couldn't automatically find the horse name.\n\nPlease type the horse's name:",
         ""
@@ -134,9 +117,6 @@ function createExportButton() {
   console.log("[EquiSync] Export button added.");
 }
 
-/**
- * Init function to run once the document is ready.
- */
 function initEquiSyncButton() {
   try {
     createExportButton();
@@ -145,7 +125,6 @@ function initEquiSyncButton() {
   }
 }
 
-// Run when page is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initEquiSyncButton);
 } else {
