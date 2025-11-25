@@ -7,13 +7,15 @@ const PLANNER_URL = "https://madzcoded.github.io/EquiSync/";
 // ==========================
 
 /**
- * Get the horse's name from the "Info" table.
+ * Try to get the horse's name from the Info table:
+ *
  * <div class="info_table_row">
  *   <div class="info_label">Name</div>
  *   <div class="info_item">Horse Name</div>
  * </div>
  */
 function getHorseNameFromPage() {
+  // Look for all rows in the info table
   const rows = document.querySelectorAll(".info_table_row");
 
   for (const row of rows) {
@@ -37,6 +39,7 @@ function getHorseNameFromPage() {
 
 /**
  * Get the horse's sex from the summary bar:
+ *
  * <p id="sex"> ... Stallion / Mare / Gelding ... </p>
  */
 function getHorseSexFromPage() {
@@ -66,6 +69,10 @@ function getHorseSexFromPage() {
   return null;
 }
 
+/**
+ * Build the URL for the planner, including query params
+ * like ?name=Horse%20Name&sex=Stallion
+ */
 function buildPlannerUrl(name, sex) {
   const params = new URLSearchParams();
   if (name) params.set("name", name);
@@ -76,7 +83,11 @@ function buildPlannerUrl(name, sex) {
   return url;
 }
 
+/**
+ * Create the floating 🐴 button on the bottom-right of the page.
+ */
 function createExportButton() {
+  // Avoid duplicates
   if (document.getElementById(BUTTON_ID)) return;
 
   const btn = document.createElement("button");
@@ -106,8 +117,10 @@ function createExportButton() {
     "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
   btn.addEventListener("click", () => {
+    // 1) Try auto-detect name
     let name = getHorseNameFromPage();
 
+    // 2) Fallback: ask the user to type it
     if (!name) {
       const manual = window.prompt(
         "EquiSync couldn't automatically find the horse name.\n\nPlease type the horse's name:",
@@ -118,9 +131,11 @@ function createExportButton() {
       if (!name) return;
     }
 
+    // 3) Sex (optional)
     const sex = getHorseSexFromPage();
-    const url = buildPlannerUrl(name, sex);
 
+    // 4) Build URL and open planner
+    const url = buildPlannerUrl(name, sex);
     window.open(url, "_blank");
   });
 
@@ -128,6 +143,9 @@ function createExportButton() {
   console.log("[EquiSync] Export button added.");
 }
 
+/**
+ * Initialize once the page is ready.
+ */
 function initEquiSyncButton() {
   try {
     createExportButton();
@@ -136,6 +154,7 @@ function initEquiSyncButton() {
   }
 }
 
+// Run when page is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initEquiSyncButton);
 } else {
