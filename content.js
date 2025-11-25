@@ -6,6 +6,13 @@ const BUTTON_ID = "equisync-export-button";
 const PLANNER_URL = "https://madzcoded.github.io/EquiSync/";
 // ==========================
 
+/**
+ * Get the horse's name from the "Info" table.
+ * <div class="info_table_row">
+ *   <div class="info_label">Name</div>
+ *   <div class="info_item">Horse Name</div>
+ * </div>
+ */
 function getHorseNameFromPage() {
   const rows = document.querySelectorAll(".info_table_row");
 
@@ -28,6 +35,10 @@ function getHorseNameFromPage() {
   return null;
 }
 
+/**
+ * Get the horse's sex from the summary bar:
+ * <p id="sex"> ... Stallion / Mare / Gelding ... </p>
+ */
 function getHorseSexFromPage() {
   const sexEl = document.querySelector("p#sex");
   if (!sexEl) {
