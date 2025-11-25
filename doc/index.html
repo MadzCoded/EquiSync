@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Horse Reality Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #f5f5f7;
+      color: #222;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      max-width: 900px;
+      width: 100%;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      margin: 0 0 0.25rem;
+      font-size: 1.75rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1rem;
+    }
+
+    @media (max-width: 600px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.85rem;
+      gap: 0.25rem;
+    }
+
+    input, textarea, select {
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      grid-column: 1 / -1;
+      margin-top: 0.25rem;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .horses-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+
+    .horses-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .filter-input {
+      max-width: 220px;
+    }
+
+    .horse-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .horse-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 0.75rem 0.9rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+    }
+
+    .horse-main {
+      min-width: 0;
+    }
+
+    .horse-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      word-break: break-word;
+    }
+
+    .horse-meta {
+      font-size: 0.8rem;
+      color: #555;
+      margin-bottom: 0.25rem;
+    }
+
+    .horse-goals {
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .horse-tags {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    .horse-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .horse-actions button {
+      padding: 0.25rem 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7280;
+      padding: 1rem 0.5rem;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Horse Reality Planner</h1>
+      <p class="subtitle">Track your horses, goals and plans (saved locally in your browser).</p>
+    </header>
+
+    <!-- Add / edit horse -->
+    <section class="card">
+      <form id="horse-form">
+        <input type="hidden" id="horse-id" />
+
+        <label>
+          Horse name
+          <input type="text" id="name" required placeholder="e.g. Starfire" />
+        </label>
+
+        <label>
+          Breed
+          <input type="text" id="breed" placeholder="e.g. Thoroughbred" />
+        </label>
+
+        <label>
+          Discipline / focus
+          <input type="text" id="discipline" placeholder="e.g. Dressage, Breeding, Training" />
+        </label>
+
+        <label>
+          Priority
+          <select id="priority">
+            <option value="">Normal</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+          </select>
+        </label>
+
+        <label class="full-width">
+          Main goals / notes
+          <textarea id="goals" placeholder="- Train stats
+- Plan breeding
+- Competition schedule"></textarea>
+        </label>
+
+        <label>
+          Target date
+          <input type="date" id="targetDate" />
+        </label>
+
+        <label>
+          Tag / stable
+          <input type="text" id="tag" placeholder="e.g. Broodmare, Foal, Show string" />
+        </label>
+
+        <div class="actions">
+          <button type="button" class="btn-secondary" id="clear-btn">Clear</button>
+          <button type="submit" class="btn-primary" id="submit-btn">Add horse</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- List of horses -->
+    <section>
+      <div class="horses-header">
+        <h2>Your horses</h2>
+        <input
+          type="text"
+          id="filter"
+          class="filter-input"
+          placeholder="Filter by name, tag, breed..."
+        />
+      </div>
+      <div id="horse-list" class="horse-list"></div>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        No horses yet. Add your first horse above 🐴
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "horseRealityPlannerV1";
+
+    function loadHorses() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error("Error loading horses", e);
+        return [];
+      }
+    }
+
+    function saveHorses(horses) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(horses));
+    }
+
+    let horses = loadHorses();
+    let editingId = null;
+
+    const form = document.getElementById("horse-form");
+    const horseIdInput = document.getElementById("horse-id");
+    const nameInput = document.getElementById("name");
+    const breedInput = document.getElementById("breed");
+    const disciplineInput = document.getElementById("discipline");
+    const priorityInput = document.getElementById("priority");
+    const goalsInput = document.getElementById("goals");
+    const targetDateInput = document.getElementById("targetDate");
+    const tagInput = document.getElementById("tag");
+    const submitBtn = document.getElementById("submit-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const filterInput = document.getElementById("filter");
+    const listEl = document.getElementById("horse-list");
+    const emptyStateEl = document.getElementById("empty-state");
+
+    function resetForm() {
+      form.reset();
+      editingId = null;
+      horseIdInput.value = "";
+      submitBtn.textContent = "Add horse";
+    }
+
+    function populateForm(horse) {
+      horseIdInput.value = horse.id;
+      nameInput.value = horse.name || "";
+      breedInput.value = horse.breed || "";
+      disciplineInput.value = horse.discipline || "";
+      priorityInput.value = horse.priority || "";
+      goalsInput.value = horse.goals || "";
+      targetDateInput.value = horse.targetDate || "";
+      tagInput.value = horse.tag || "";
+      editingId = horse.id;
+      submitBtn.textContent = "Save changes";
+      nameInput.focus();
+    }
+
+    function renderHorses() {
+      const filter = filterInput.value.trim().toLowerCase();
+      listEl.innerHTML = "";
+
+      const filtered = horses.filter((h) => {
+        if (!filter) return true;
+        return (
+          (h.name || "").toLowerCase().includes(filter) ||
+          (h.breed || "").toLowerCase().includes(filter) ||
+          (h.tag || "").toLowerCase().includes(filter) ||
+          (h.discipline || "").toLowerCase().includes(filter)
+        );
+      });
+
+      if (filtered.length === 0) {
+        emptyStateEl.style.display = "block";
+        return;
+      } else {
+        emptyStateEl.style.display = "none";
+      }
+
+      filtered
+        .slice()
+        .sort((a, b) => {
+          const pa = (a.priority || "").toLowerCase();
+          const pb = (b.priority || "").toLowerCase();
+          if (pa === pb) return (a.name || "").localeCompare(b.name || "");
+          if (pa === "high") return -1;
+          if (pb === "high") return 1;
+          if (pa === "low") return 1;
+          if (pb === "low") return -1;
+          return 0;
+        })
+        .forEach((horse) => {
+          const card = document.createElement("div");
+          card.className = "horse-card";
+
+          const main = document.createElement("div");
+          main.className = "horse-main";
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "horse-name";
+          nameEl.textContent = horse.name || "Unnamed horse";
+
+          const metaEl = document.createElement("div");
+          metaEl.className = "horse-meta";
+
+          const bits = [];
+          if (horse.breed) bits.push(horse.breed);
+          if (horse.discipline) bits.push(horse.discipline);
+          if (horse.priority) bits.push("Priority: " + horse.priority);
+          if (horse.targetDate) bits.push("Target: " + horse.targetDate);
+
+          metaEl.textContent = bits.join(" • ");
+
+          const goalsEl = document.createElement("div");
+          goalsEl.className = "horse-goals";
+          goalsEl.textContent = horse.goals || "";
+
+          const tagsEl = document.createElement("div");
+          tagsEl.className = "horse-tags";
+          tagsEl.textContent = horse.tag ? "#" + horse.tag : "";
+
+          main.appendChild(nameEl);
+          if (bits.length > 0) main.appendChild(metaEl);
+          if (horse.goals) main.appendChild(goalsEl);
+          if (horse.tag) main.appendChild(tagsEl);
+
+          const actions = document.createElement("div");
+          actions.className = "horse-actions";
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "btn-secondary";
+          editBtn.textContent = "Edit";
+          editBtn.addEventListener("click", () => populateForm(horse));
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn-danger";
+          deleteBtn.textContent = "Delete";
+          deleteBtn.addEventListener("click", () => {
+            if (!confirm(`Delete ${horse.name || "this horse"}?`)) return;
+            horses = horses.filter((h) => h.id !== horse.id);
+            saveHorses(horses);
+            renderHorses();
+            if (editingId === horse.id) {
+              resetForm();
+            }
+          });
+
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+
+          card.appendChild(main);
+          card.appendChild(actions);
+
+          listEl.appendChild(card);
+        });
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert("Please enter a horse name.");
+        return;
+      }
+
+      const horseData = {
+        id: editingId || String(Date.now()),
+        name,
+        breed: breedInput.value.trim(),
+        discipline: disciplineInput.value.trim(),
+        priority: priorityInput.value,
+        goals: goalsInput.value.trim(),
+        targetDate: targetDateInput.value,
+        tag: tagInput.value.trim()
+      };
+
+      if (editingId) {
+        horses = horses.map((h) => (h.id === editingId ? horseData : h));
+      } else {
+        horses.push(horseData);
+      }
+
+      saveHorses(horses);
+      renderHorses();
+      resetForm();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      resetForm();
+    });
+
+    filterInput.addEventListener("input", () => {
+      renderHorses();
+    });
+
+    // Initial render
+    renderHorses();
+  </script>
+</body>
+</html>
