@@ -1143,9 +1143,24 @@
       renderHorses();
     });
 
+    function applyNameFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const incomingName = params.get("name");
+        if (!incomingName) return;
+
+        nameInput.value = incomingName;
+        nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        nameInput.focus();
+      } catch (e) {
+        console.error("Failed to read name from URL", e);
+      }
+    }
+
     // Initial
     updateAgeDisplay();
     renderHorses();
+    applyNameFromUrl();
   </script>
 </body>
 </html>
