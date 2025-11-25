@@ -1,27 +1,29 @@
 // ========= CONFIG =========
-const HORSE_NAME_SELECTORS = [
-  "#name",                      // your original guess
-  ".horse-name",                // common pattern
-  ".horse-header h1",
-  "h1"                           // fall back to first h1
-];
-
 const BUTTON_ID = "equisync-export-button";
 const PLANNER_URL = "https://madzcoded.github.io/EquiSync/";
 // ==========================
 
 function getHorseNameFromPage() {
-  for (const selector of HORSE_NAME_SELECTORS) {
-    const el = document.querySelector(selector);
-    if (el && el.textContent.trim()) {
-      return el.textContent.trim();
+  const rows = document.querySelectorAll(".info_table_row");
+
+  for (const row of rows) {
+    const label = row.querySelector(".info_label");
+    if (!label) continue;
+
+    const labelText = label.textContent.trim().toLowerCase();
+    if (labelText === "name") {
+      const item = row.querySelector(".info_item");
+      if (item && item.textContent.trim()) {
+        return item.textContent.trim();
+      }
     }
   }
+
+  // fallback to prompt
   return null;
 }
 
 function createExportButton() {
-  // Avoid duplicates
   if (document.getElementById(BUTTON_ID)) return;
 
   const btn = document.createElement("button");
@@ -45,26 +47,18 @@ function createExportButton() {
   btn.style.cursor = "pointer";
   btn.style.boxShadow = "0 6px 14px rgba(15, 23, 42, 0.35)";
   btn.style.zIndex = "999999";
-  btn.style.padding = "0";
-  btn.style.lineHeight = "1";
-  btn.style.fontFamily =
-    "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
   btn.addEventListener("click", () => {
     let name = getHorseNameFromPage();
 
     if (!name) {
-      const manual = window.prompt(
-        "EquiSync couldn't automatically find the horse name.\n\nPlease type the horse's name:",
-        ""
+      name = prompt(
+        "EquiSync couldn't find the horse name automatically.\n\nPlease type it manually:"
       );
-      if (!manual) return;
-      name = manual.trim();
       if (!name) return;
     }
 
     const url = PLANNER_URL + "?name=" + encodeURIComponent(name);
-    console.log("[EquiSync] Opening planner with horse name:", name, url);
     window.open(url, "_blank");
   });
 
@@ -72,11 +66,9 @@ function createExportButton() {
 }
 
 function initEquiSyncButton() {
-  // Just create the button; it will try to read the name on click
   createExportButton();
 }
 
-// Run when page is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initEquiSyncButton);
 } else {
