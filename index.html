@@ -20,7 +20,7 @@
     }
 
     .app {
-      max-width: 980px;
+      max-width: 1100px;
       width: 100%;
       padding: 1.5rem;
       box-sizing: border-box;
@@ -58,7 +58,7 @@
       gap: 0.85rem 1.1rem;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 850px) {
       form {
         grid-template-columns: 1fr;
       }
@@ -98,15 +98,6 @@
 
     .full-width {
       grid-column: 1 / -1;
-    }
-
-    .field-row {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .field-row > label {
-      flex: 1;
     }
 
     .actions {
@@ -154,6 +145,36 @@
     .btn-danger {
       background: #ef4444;
       color: white;
+    }
+
+    .section-title {
+      grid-column: 1 / -1;
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .section-title span {
+      height: 1px;
+      flex: 1;
+      background: #e5e7eb;
+    }
+
+    .field-row-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem 1.1rem;
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 700px) {
+      .field-row-2 {
+        grid-template-columns: 1fr;
+      }
     }
 
     .horses-header {
@@ -216,18 +237,69 @@
       box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
       border: 1px solid rgba(148, 163, 184, 0.4);
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.6rem;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.75rem;
+      align-items: center;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 650px) {
       .horse-card {
         grid-template-columns: 1fr;
+        align-items: flex-start;
       }
-      .horse-actions {
-        flex-direction: row;
-        justify-content: flex-end;
-      }
+    }
+
+    .horse-avatar-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .horse-avatar {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: #e5e7eb;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #4b5563;
+    }
+
+    .horse-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .foal-badge {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 2px solid #f9fafb;
+      overflow: hidden;
+      background: #fef3c7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .foal-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .horse-main {
@@ -245,6 +317,17 @@
     .horse-name {
       font-weight: 600;
       word-break: break-word;
+    }
+
+    .stable-pill {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      background: #eef2ff;
+      color: #3730a3;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
     }
 
     .priority-pill {
@@ -281,23 +364,16 @@
       margin-bottom: 0.2rem;
     }
 
+    .horse-submeta {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
     .horse-goals {
       font-size: 0.86rem;
       white-space: pre-wrap;
       word-break: break-word;
-      margin-top: 0.15rem;
-    }
-
-    .horse-tags {
-      font-size: 0.78rem;
-      color: #4b5563;
-      margin-top: 0.25rem;
-    }
-
-    .horse-tags span {
-      background: #eef2ff;
-      border-radius: 999px;
-      padding: 0.1rem 0.5rem;
+      margin-top: 0.3rem;
     }
 
     .horse-actions {
@@ -320,13 +396,67 @@
       color: #6b7280;
       padding: 1.2rem 0.5rem;
     }
+
+    details {
+      grid-column: 1 / -1;
+      border-radius: 12px;
+      background: #f9fafb;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #4b5563;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .details-grid {
+      margin-top: 0.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      .details-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .details-grid label {
+      margin: 0;
+    }
+
+    .details-grid input,
+    .details-grid select {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.7rem;
+    }
+
+    .readonly {
+      background-color: #e5e7eb;
+      cursor: default;
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
       <h1>Horse Reality Planner</h1>
-      <p class="subtitle">Track your horses, goals and plans (saved locally in your browser).</p>
+      <p class="subtitle">Track your horses, stables, goals and stats (saved locally in your browser).</p>
     </header>
 
     <!-- Add / edit horse -->
@@ -334,14 +464,98 @@
       <form id="horse-form">
         <input type="hidden" id="horse-id" />
 
+        <!-- Identity -->
+        <div class="section-title">
+          Identity
+          <span></span>
+        </div>
+
         <label>
-          Horse name
+          Lifenumber
+          <input type="text" id="lifeNumber" placeholder="e.g. HR-123456" />
+        </label>
+
+        <label>
+          Name
           <input type="text" id="name" required placeholder="e.g. Starfire" />
+        </label>
+
+        <label>
+          Sex
+          <select id="sex">
+            <option value="">Unknown</option>
+            <option value="Mare">Mare</option>
+            <option value="Stallion">Stallion</option>
+            <option value="Gelding">Gelding</option>
+            <option value="Filly">Filly</option>
+            <option value="Colt">Colt</option>
+          </select>
         </label>
 
         <label>
           Breed
           <input type="text" id="breed" placeholder="e.g. Thoroughbred" />
+        </label>
+
+        <!-- Ownership / age -->
+        <div class="section-title">
+          Age & ownership
+          <span></span>
+        </div>
+
+        <label>
+          Birthday
+          <input type="date" id="birthday" />
+        </label>
+
+        <label>
+          Age (auto)
+          <input type="text" id="ageDisplay" class="readonly" readonly placeholder="Will auto-calc from birthday" />
+        </label>
+
+        <label>
+          Owner
+          <input type="text" id="owner" placeholder="Your username" />
+        </label>
+
+        <label>
+          Breeder
+          <input type="text" id="breeder" placeholder="Breeder name" />
+        </label>
+
+        <label>
+          Location
+          <input type="text" id="location" placeholder="e.g. Willowmere Stud" />
+        </label>
+
+        <label>
+          Colours / patterns
+          <input type="text" id="colourPattern" placeholder="e.g. Bay tobiano, flaxen" />
+        </label>
+
+        <!-- Stable / focus -->
+        <div class="section-title">
+          Stable & focus
+          <span></span>
+        </div>
+
+        <label>
+          Stable / group
+          <select id="stable">
+            <option value="">Unassigned</option>
+            <option value="Broodmare">Broodmares</option>
+            <option value="Stallion">Stallions</option>
+            <option value="Foal">Foals</option>
+            <option value="Show">Show string</option>
+            <option value="Breeder">Breeders</option>
+            <option value="Retired">Retired</option>
+            <option value="Custom">Custom (type below)</option>
+          </select>
+        </label>
+
+        <label>
+          Custom stable name
+          <input type="text" id="stableCustom" placeholder="If 'Custom' above, type group name" />
         </label>
 
         <label>
@@ -358,24 +572,108 @@
           </select>
         </label>
 
-        <label class="full-width">
-          Main goals / notes
-          <textarea id="goals" placeholder="- Train stats
-- Plan breeding
-- Competition schedule"></textarea>
+        <!-- Images -->
+        <div class="section-title">
+          Images
+          <span></span>
+        </div>
+
+        <label>
+          Portrait image URL
+          <input type="url" id="portraitUrl" placeholder="Paste horse portrait image URL" />
         </label>
 
-        <div class="field-row">
-          <label>
-            Target date
-            <input type="date" id="targetDate" />
-          </label>
+        <label>
+          Foal image URL
+          <input type="url" id="foalUrl" placeholder="Paste foal image URL" />
+        </label>
 
-          <label>
-            Tag / stable
-            <input type="text" id="tag" placeholder="e.g. Broodmare, Foal, Show string" />
-          </label>
-        </div>
+        <!-- Goals / notes -->
+        <label class="full-width">
+          Main goals / notes
+          <textarea id="goals" placeholder="- Train stats&#10;- Plan breeding&#10;- Competition schedule"></textarea>
+        </label>
+
+        <!-- Genetics -->
+        <details>
+          <summary>Genetic Potential (numbers)</summary>
+          <div class="details-grid">
+            <label>Acceleration <input type="number" id="gp-acceleration" step="0.01" /></label>
+            <label>Agility <input type="number" id="gp-agility" step="0.01" /></label>
+            <label>Balance <input type="number" id="gp-balance" step="0.01" /></label>
+            <label>Bascule <input type="number" id="gp-bascule" step="0.01" /></label>
+            <label>Pulling power <input type="number" id="gp-pullingPower" step="0.01" /></label>
+            <label>Speed <input type="number" id="gp-speed" step="0.01" /></label>
+            <label>Sprint <input type="number" id="gp-sprint" step="0.01" /></label>
+            <label>Stamina <input type="number" id="gp-stamina" step="0.01" /></label>
+            <label>Strength <input type="number" id="gp-strength" step="0.01" /></label>
+            <label>Surefootedness <input type="number" id="gp-surefootedness" step="0.01" /></label>
+          </div>
+        </details>
+
+        <!-- Conformation -->
+        <details>
+          <summary>Conformation (Below average → Very good)</summary>
+          <div class="details-grid">
+            <label>Walk
+              <select id="conf-walk"></select>
+            </label>
+            <label>Trot
+              <select id="conf-trot"></select>
+            </label>
+            <label>Canter
+              <select id="conf-canter"></select>
+            </label>
+            <label>Gallop
+              <select id="conf-gallop"></select>
+            </label>
+            <label>Revaal
+              <select id="conf-revaal"></select>
+            </label>
+            <label>Posture
+              <select id="conf-posture"></select>
+            </label>
+            <label>Head
+              <select id="conf-head"></select>
+            </label>
+            <label>Neck / back
+              <select id="conf-neckBack"></select>
+            </label>
+            <label>Shoulders
+              <select id="conf-shoulders"></select>
+            </label>
+            <label>Frontlegs
+              <select id="conf-frontlegs"></select>
+            </label>
+            <label>Hindquarters
+              <select id="conf-hindquarters"></select>
+            </label>
+            <label>Socks
+              <select id="conf-socks"></select>
+            </label>
+          </div>
+        </details>
+
+        <!-- Pedigree / foals (text for now) -->
+        <details>
+          <summary>Pedigree & foals</summary>
+          <div class="details-grid">
+            <label>Sire
+              <input type="text" id="sire" placeholder="Sire name / lifenumber" />
+            </label>
+            <label>Dam
+              <input type="text" id="dam" placeholder="Dam name / lifenumber" />
+            </label>
+            <label class="full-width">
+              Pedigree notes
+              <textarea id="pedigreeNotes" rows="2" style="border-radius:12px;"></textarea>
+            </label>
+            <label class="full-width">
+              Foals (list)
+              <textarea id="foalsNotes" rows="2" style="border-radius:12px;" placeholder="- 2025-01-01 Colt: Name&#10;- 2026-03-05 Filly: Name"></textarea>
+            </label>
+          </div>
+        </details>
 
         <div class="actions">
           <button type="button" class="btn-secondary" id="clear-btn">Clear</button>
@@ -395,13 +693,13 @@
           <select id="sortBy">
             <option value="priority">Sort by: Priority</option>
             <option value="name">Sort by: Name</option>
-            <option value="targetDate">Sort by: Target date</option>
+            <option value="targetDate">Sort by: Birthday</option>
           </select>
           <input
             type="text"
             id="filter"
             class="filter-input"
-            placeholder="Filter by name, tag, breed..."
+            placeholder="Filter by name, stable, breed, location..."
           />
         </div>
       </div>
@@ -413,7 +711,34 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "horseRealityPlannerV1";
+    const STORAGE_KEY = "horseRealityPlannerV2";
+
+    const CONFORMATION_FIELDS = [
+      "walk","trot","canter","gallop","revaal",
+      "posture","head","neckBack","shoulders",
+      "frontlegs","hindquarters","socks"
+    ];
+
+    const GP_FIELDS = [
+      "acceleration","agility","balance","bascule","pullingPower",
+      "speed","sprint","stamina","strength","surefootedness"
+    ];
+
+    const CONF_OPTIONS = ["", "Below average", "Average", "Good", "Very good"];
+
+    function populateConformationSelects() {
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(`conf-${key}`);
+        if (!sel) return;
+        sel.innerHTML = "";
+        CONF_OPTIONS.forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt || "Not set";
+          sel.appendChild(o);
+        });
+      });
+    }
 
     function loadHorses() {
       try {
@@ -436,14 +761,29 @@
 
     const form = document.getElementById("horse-form");
     const horseIdInput = document.getElementById("horse-id");
+
+    const lifeNumberInput = document.getElementById("lifeNumber");
     const nameInput = document.getElementById("name");
+    const sexInput = document.getElementById("sex");
     const breedInput = document.getElementById("breed");
+    const birthdayInput = document.getElementById("birthday");
+    const ageDisplayInput = document.getElementById("ageDisplay");
+    const ownerInput = document.getElementById("owner");
+    const breederInput = document.getElementById("breeder");
+    const locationInput = document.getElementById("location");
+    const colourPatternInput = document.getElementById("colourPattern");
+    const stableSelect = document.getElementById("stable");
+    const stableCustomInput = document.getElementById("stableCustom");
     const disciplineInput = document.getElementById("discipline");
     const priorityInput = document.getElementById("priority");
+    const portraitUrlInput = document.getElementById("portraitUrl");
+    const foalUrlInput = document.getElementById("foalUrl");
     const goalsInput = document.getElementById("goals");
-    const targetDateInput = document.getElementById("targetDate");
-    const tagInput = document.getElementById("tag");
-    const submitBtn = document.getElementById("submit-btn");
+    const sireInput = document.getElementById("sire");
+    const damInput = document.getElementById("dam");
+    const pedigreeNotesInput = document.getElementById("pedigreeNotes");
+    const foalsNotesInput = document.getElementById("foalsNotes");
+
     const clearBtn = document.getElementById("clear-btn");
     const filterInput = document.getElementById("filter");
     const sortBySelect = document.getElementById("sortBy");
@@ -451,24 +791,94 @@
     const emptyStateEl = document.getElementById("empty-state");
     const summaryEl = document.getElementById("summary");
 
+    populateConformationSelects();
+
+    function calculateAgeDisplay(birthdayStr) {
+      if (!birthdayStr) return "";
+      const birthDate = new Date(birthdayStr);
+      if (Number.isNaN(birthDate.getTime())) return "";
+      const today = new Date();
+      let years = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        years--;
+      }
+      if (years < 0) return "";
+      if (years === 0) {
+        // months
+        const months = (today.getFullYear() - birthDate.getFullYear()) * 12 + m;
+        if (months <= 0) return "Foal";
+        return months + " mo";
+      }
+      return years + " yr";
+    }
+
+    function updateAgeDisplay() {
+      ageDisplayInput.value = calculateAgeDisplay(birthdayInput.value.trim());
+    }
+
+    birthdayInput.addEventListener("change", updateAgeDisplay);
+
+    function getStableLabel(horse) {
+      if (horse.stable && horse.stable !== "Custom") return horse.stable;
+      if (horse.stable === "Custom" && horse.stableCustom) return horse.stableCustom;
+      return "";
+    }
+
     function resetForm() {
       form.reset();
       editingId = null;
       horseIdInput.value = "";
-      submitBtn.textContent = "Add horse";
+      ageDisplayInput.value = "";
+      GP_FIELDS.forEach(key => {
+        const input = document.getElementById(`gp-${key}`);
+        if (input) input.value = "";
+      });
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(`conf-${key}`);
+        if (sel) sel.value = "";
+      });
+      document.getElementById("submit-btn").textContent = "Add horse";
     }
 
     function populateForm(horse) {
       horseIdInput.value = horse.id;
+      lifeNumberInput.value = horse.lifeNumber || "";
       nameInput.value = horse.name || "";
+      sexInput.value = horse.sex || "";
       breedInput.value = horse.breed || "";
+      birthdayInput.value = horse.birthday || "";
+      ageDisplayInput.value = calculateAgeDisplay(horse.birthday || "");
+      ownerInput.value = horse.owner || "";
+      breederInput.value = horse.breeder || "";
+      locationInput.value = horse.location || "";
+      colourPatternInput.value = horse.colourPattern || "";
+      stableSelect.value = horse.stable || "";
+      stableCustomInput.value = horse.stableCustom || "";
       disciplineInput.value = horse.discipline || "";
       priorityInput.value = horse.priority || "";
+      portraitUrlInput.value = horse.portraitUrl || "";
+      foalUrlInput.value = horse.foalUrl || "";
       goalsInput.value = horse.goals || "";
-      targetDateInput.value = horse.targetDate || "";
-      tagInput.value = horse.tag || "";
+      sireInput.value = horse.sire || "";
+      damInput.value = horse.dam || "";
+      pedigreeNotesInput.value = horse.pedigreeNotes || "";
+      foalsNotesInput.value = horse.foalsNotes || "";
+
+      const gp = horse.gp || {};
+      GP_FIELDS.forEach(key => {
+        const input = document.getElementById(`gp-${key}`);
+        if (input) input.value = gp[key] ?? "";
+      });
+
+      const conf = horse.conformation || {};
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(`conf-${key}`);
+        if (sel) sel.value = conf[key] || "";
+      });
+
       editingId = horse.id;
-      submitBtn.textContent = "Save changes";
+      document.getElementById("submit-btn").textContent = "Save changes";
       nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
       nameInput.focus();
     }
@@ -477,7 +887,7 @@
       const p = (priority || "").toLowerCase();
       if (p === "high") return 0;
       if (p === "low") return 2;
-      return 1; // normal/empty
+      return 1;
     }
 
     function updateSummary(filteredCount) {
@@ -490,9 +900,7 @@
       }
 
       let text = `${filteredCount} of ${total} horses shown`;
-      if (high > 0) {
-        text += ` • ${high} high priority`;
-      }
+      if (high > 0) text += ` • ${high} high priority`;
       summaryEl.textContent = text;
     }
 
@@ -503,12 +911,11 @@
 
       let filtered = horses.filter((h) => {
         if (!filter) return true;
-        return (
-          (h.name || "").toLowerCase().includes(filter) ||
-          (h.breed || "").toLowerCase().includes(filter) ||
-          (h.tag || "").toLowerCase().includes(filter) ||
-          (h.discipline || "").toLowerCase().includes(filter)
-        );
+        const stableLabel = getStableLabel(h);
+        return [
+          h.name, h.breed, h.lifeNumber, h.location, stableLabel,
+          h.owner, h.sex
+        ].some(v => (v || "").toLowerCase().includes(filter));
       });
 
       if (filtered.length === 0) {
@@ -524,7 +931,8 @@
           return (a.name || "").localeCompare(b.name || "");
         }
         if (sortBy === "targetDate") {
-          return (a.targetDate || "").localeCompare(b.targetDate || "");
+          // use birthday for now
+          return (a.birthday || "").localeCompare(b.birthday || "");
         }
         // default: priority
         const ra = priorityRank(a.priority);
@@ -539,6 +947,36 @@
         const card = document.createElement("div");
         card.className = "horse-card";
 
+        // Avatar
+        const avatarWrapper = document.createElement("div");
+        avatarWrapper.className = "horse-avatar-wrapper";
+
+        const avatar = document.createElement("div");
+        avatar.className = "horse-avatar";
+
+        if (horse.portraitUrl) {
+          const img = document.createElement("img");
+          img.src = horse.portraitUrl;
+          img.alt = horse.name || "Horse portrait";
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = (horse.name || "?").charAt(0).toUpperCase();
+        }
+
+        if (horse.foalUrl) {
+          const foal = document.createElement("div");
+          foal.className = "foal-badge";
+          const fi = document.createElement("img");
+          fi.src = horse.foalUrl;
+          fi.alt = "Foal";
+          foal.appendChild(fi);
+          avatar.appendChild(foal);
+        }
+
+        avatarWrapper.appendChild(avatar);
+        card.appendChild(avatarWrapper);
+
+        // Main info
         const main = document.createElement("div");
         main.className = "horse-main";
 
@@ -548,13 +986,19 @@
         const nameEl = document.createElement("div");
         nameEl.className = "horse-name";
         nameEl.textContent = horse.name || "Unnamed horse";
-
         topRow.appendChild(nameEl);
+
+        const stableLabel = getStableLabel(horse);
+        if (stableLabel) {
+          const stablePill = document.createElement("span");
+          stablePill.className = "stable-pill";
+          stablePill.textContent = stableLabel;
+          topRow.appendChild(stablePill);
+        }
 
         const p = (horse.priority || "").toLowerCase();
         const pill = document.createElement("span");
         pill.className = "priority-pill";
-
         if (p === "high") {
           pill.classList.add("priority-high");
           pill.textContent = "High priority";
@@ -569,31 +1013,34 @@
 
         const metaEl = document.createElement("div");
         metaEl.className = "horse-meta";
-
         const bits = [];
+        if (horse.lifeNumber) bits.push(horse.lifeNumber);
+        if (horse.sex) bits.push(horse.sex);
         if (horse.breed) bits.push(horse.breed);
-        if (horse.discipline) bits.push(horse.discipline);
-        if (horse.targetDate) bits.push("Target: " + horse.targetDate);
-
+        const ageText = calculateAgeDisplay(horse.birthday || "");
+        if (ageText) bits.push(ageText);
         metaEl.textContent = bits.join(" • ");
+
+        const submetaEl = document.createElement("div");
+        submetaEl.className = "horse-submeta";
+        const bits2 = [];
+        if (horse.owner) bits2.push("Owner: " + horse.owner);
+        if (horse.location) bits2.push("Location: " + horse.location);
+        if (horse.discipline) bits2.push("Focus: " + horse.discipline);
+        submetaEl.textContent = bits2.join(" • ");
 
         const goalsEl = document.createElement("div");
         goalsEl.className = "horse-goals";
         goalsEl.textContent = horse.goals || "";
 
-        const tagsEl = document.createElement("div");
-        tagsEl.className = "horse-tags";
-        if (horse.tag) {
-          const span = document.createElement("span");
-          span.textContent = "#" + horse.tag;
-          tagsEl.appendChild(span);
-        }
-
         main.appendChild(topRow);
         if (bits.length > 0) main.appendChild(metaEl);
+        if (bits2.length > 0) main.appendChild(submetaEl);
         if (horse.goals) main.appendChild(goalsEl);
-        if (horse.tag) main.appendChild(tagsEl);
 
+        card.appendChild(main);
+
+        // Actions
         const actions = document.createElement("div");
         actions.className = "horse-actions";
 
@@ -618,7 +1065,6 @@
         actions.appendChild(editBtn);
         actions.appendChild(deleteBtn);
 
-        card.appendChild(main);
         card.appendChild(actions);
 
         listEl.appendChild(card);
@@ -633,15 +1079,45 @@
         return;
       }
 
+      const gp = {};
+      GP_FIELDS.forEach(key => {
+        const input = document.getElementById(`gp-${key}`);
+        if (!input) return;
+        const v = input.value.trim();
+        gp[key] = v === "" ? null : Number(v);
+      });
+
+      const conformation = {};
+      CONFORMATION_FIELDS.forEach(key => {
+        const sel = document.getElementById(`conf-${key}`);
+        if (!sel) return;
+        conformation[key] = sel.value;
+      });
+
       const horseData = {
         id: editingId || String(Date.now()),
+        lifeNumber: lifeNumberInput.value.trim(),
         name,
+        sex: sexInput.value,
         breed: breedInput.value.trim(),
+        birthday: birthdayInput.value,
+        owner: ownerInput.value.trim(),
+        breeder: breederInput.value.trim(),
+        location: locationInput.value.trim(),
+        colourPattern: colourPatternInput.value.trim(),
+        stable: stableSelect.value,
+        stableCustom: stableCustomInput.value.trim(),
         discipline: disciplineInput.value.trim(),
         priority: priorityInput.value,
+        portraitUrl: portraitUrlInput.value.trim(),
+        foalUrl: foalUrlInput.value.trim(),
         goals: goalsInput.value.trim(),
-        targetDate: targetDateInput.value,
-        tag: tagInput.value.trim()
+        gp,
+        conformation,
+        sire: sireInput.value.trim(),
+        dam: damInput.value.trim(),
+        pedigreeNotes: pedigreeNotesInput.value.trim(),
+        foalsNotes: foalsNotesInput.value.trim()
       };
 
       if (editingId) {
@@ -667,7 +1143,8 @@
       renderHorses();
     });
 
-    // Initial render
+    // Initial
+    updateAgeDisplay();
     renderHorses();
   </script>
 </body>
