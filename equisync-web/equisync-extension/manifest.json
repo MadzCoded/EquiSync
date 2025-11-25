@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "EquiSync – Horse Reality Helper",
+  "version": "0.0.1",
+  "description": "Adds a button on Horse Reality horse pages and extracts the horse's name.",
+  "permissions": [],
+  "host_permissions": [
+    "*://horsereality.com/*",
+    "*://www.horsereality.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://horsereality.com/*",
+        "*://www.horsereality.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
