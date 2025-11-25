@@ -1,8 +1,7 @@
 // ====== CONFIG: tweak these selectors once you see the real page ======
 const HORSE_NAME_SELECTORS = [
-  ".horse-name",        // example class
-  ".horse-header h1",   // example header
-  "h1"                  // last fallback: first <h1> on the page
+  "#name",   // your confirmed selector
+  "h1"       // fallback
 ];
 
 // Where to insert the button. We'll try a few common places:
