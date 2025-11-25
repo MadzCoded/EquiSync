@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "EquiSync – Horse Reality Helper",
+  "version": "0.1.0",
+  "description": "Adds an EquiSync button next to the Edit tab on Horse Reality horse pages.",
+  "content_scripts": [
+    {
+      "matches": ["*://www.horsereality.com/horses/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
