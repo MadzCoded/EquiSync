@@ -265,6 +265,101 @@
   background: rgba(15, 23, 42, 0.85);
   box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
 }
+    
+.stable-list {
+  margin-top: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.stable-list-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.stable-list-header h2 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.stable-empty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.stable-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.stable-item {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.stable-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.stable-item-id {
+  font-weight: 500;
+}
+
+.stable-item-url {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.stable-item a {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.stable-item a:hover {
+  text-decoration: underline;
+}
+
+    .add-horse-btn {
+  margin-top: 0.3rem;
+  padding: 0.8rem 1.2rem;
+  background: linear-gradient(135deg, #f97316, #facc15);
+  border: none;
+  border-radius: 0.75rem;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+}
+
+.add-horse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.6);
+}
+
+.add-horse-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+}
   </style>
 </head>
 <body>
@@ -294,15 +389,27 @@
         </header>
 
         <!-- URL paste box goes here -->
-        <div class="url-input-wrapper">
-          <label for="horse-url">Paste Horse URL</label>
-          <input
-            type="url"
-            id="horse-url"
-            class="url-box"
-            placeholder="https://www.horsereality.com/horses/123456..."
-          />
-        </div>
+<div class="url-input-wrapper">
+  <label for="horse-url">Paste Horse URL</label>
+  <input
+    type="url"
+    id="horse-url"
+    class="url-box"
+    placeholder="https://www.horsereality.com/horses/123456..."
+  />
+
+  <button class="add-horse-btn" id="add-horse-btn">
+    Add Horse
+  </button>
+</div>
+
+  <section class="stable-list" id="stable-list">
+  <div class="stable-list-header">
+    <h2>Your Stable</h2>
+  </div>
+  <p class="stable-empty" id="stable-empty">No horses added yet.</p>
+  <ul class="stable-items" id="stable-items"></ul>
+</section>
 
         <footer class="footer">
           <div class="author">
@@ -320,5 +427,130 @@
       </div>
     </section>
   </main>
+
+  <script>
+  (function () {
+    const urlInput = document.getElementById('horse-url');
+    const addBtn = document.getElementById('add-horse-btn');
+    const emptyMsg = document.getElementById('stable-empty');
+    const listEl = document.getElementById('stable-items');
+
+    let horses = [];
+
+    function loadStable() {
+      try {
+        const raw = localStorage.getItem('equisyncStable');
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          horses = parsed;
+        }
+      } catch (e) {
+        console.error('Failed to load stable', e);
+      }
+    }
+
+    function saveStable() {
+      try {
+        localStorage.setItem('equisyncStable', JSON.stringify(horses));
+      } catch (e) {
+        console.error('Failed to save stable', e);
+      }
+    }
+
+    function renderStable() {
+      if (!listEl || !emptyMsg) return;
+      listEl.innerHTML = '';
+
+      if (!horses.length) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+
+      emptyMsg.style.display = 'none';
+
+      horses.forEach((horse) => {
+        const li = document.createElement('li');
+        li.className = 'stable-item';
+
+        const main = document.createElement('div');
+        main.className = 'stable-item-main';
+
+        const idLine = document.createElement('div');
+        idLine.className = 'stable-item-id';
+        idLine.textContent = horse.id ? `Horse #${horse.id}` : 'Horse';
+
+        const urlLine = document.createElement('div');
+        urlLine.className = 'stable-item-url';
+        urlLine.textContent = horse.url;
+
+        main.appendChild(idLine);
+        main.appendChild(urlLine);
+
+        const link = document.createElement('a');
+        link.href = horse.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = 'Open';
+
+        li.appendChild(main);
+        li.appendChild(link);
+        listEl.appendChild(li);
+      });
+    }
+
+    function handleAdd() {
+      const raw = urlInput.value.trim();
+      if (!raw) {
+        alert('Please paste a Horse Reality horse URL first.');
+        return;
+      }
+
+      let url;
+      try {
+        url = new URL(raw);
+      } catch {
+        alert('That does not look like a valid URL.');
+        return;
+      }
+
+      // Optional: enforce Horse Reality domain
+      if (!url.hostname.includes('horsereality')) {
+        const proceed = confirm(
+          'This URL is not from horsereality.com. Add it anyway?'
+        );
+        if (!proceed) return;
+      }
+
+      // Try to extract horse ID from URL (e.g. /horses/123456)
+      const match = url.href.match(/horses\/(\d+)/i);
+      const id = match ? match[1] : null;
+
+      // Prevent duplicates
+      if (horses.some((h) => h.url === url.href)) {
+        alert('This horse is already in your stable list.');
+        return;
+      }
+
+      const horse = {
+        id,
+        url: url.href,
+        addedAt: Date.now()
+      };
+
+      horses.push(horse);
+      saveStable();
+      renderStable();
+      urlInput.value = '';
+    }
+
+    if (addBtn) {
+      addBtn.addEventListener('click', handleAdd);
+    }
+
+    loadStable();
+    renderStable();
+  })();
+</script>
 </body>
 </html>
