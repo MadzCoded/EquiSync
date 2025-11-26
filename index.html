@@ -428,7 +428,7 @@
     </section>
   </main>
 
-  <script>
+<script>
   (function () {
     const urlInput = document.getElementById('horse-url');
     const addBtn = document.getElementById('add-horse-btn');
@@ -499,6 +499,32 @@
       });
     }
 
+    // ✅ NEW: import from ?horse=123456 in the URL
+    function importHorseFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('horse');
+      if (!id) return;
+
+      // accept only digits
+      if (!/^\d+$/.test(id)) return;
+
+      const url = `https://horsereality.com/horses/${id}/`;
+
+      // Avoid duplicates (by URL)
+      if (horses.some((h) => h.url === url)) {
+        return;
+      }
+
+      const horse = {
+        id,
+        url,
+        addedAt: Date.now()
+      };
+
+      horses.push(horse);
+      saveStable();
+    }
+
     function handleAdd() {
       const raw = urlInput.value.trim();
       if (!raw) {
@@ -548,7 +574,9 @@
       addBtn.addEventListener('click', handleAdd);
     }
 
+    // ✅ Order matters: load → import from query → render
     loadStable();
+    importHorseFromQuery();
     renderStable();
   })();
 </script>
