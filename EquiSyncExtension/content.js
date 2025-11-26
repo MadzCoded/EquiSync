@@ -46,28 +46,17 @@ function insertEquiSyncButton() {
 
     const lifeNumber = match[1];
 
-    // Extract horse name from the page: <h1 id="name">Horse Name</h1>
-// Get <h1 id="name"> that contains the horse's name
-const nameEl = document.querySelector("h1#name");
-
-// Extract ONLY the text node (exclude icons)
+// Extract horse name (bulletproof)
 let horseName = "Unknown";
+const nameEl = document.querySelector("#name");
+
 if (nameEl) {
-  // Find the first real text node inside the element
-  const textNode = Array.from(nameEl.childNodes)
-    .find(n => n.nodeType === Node.TEXT_NODE);
-
-  if (textNode) {
-    horseName = textNode.textContent.trim();
-  }
+  horseName = Array.from(nameEl.childNodes)
+    .filter(n => n.nodeType === Node.TEXT_NODE)
+    .map(n => n.textContent.trim())
+    .join(" ")
+    .trim();
 }
-
-    // Your EquiSync site URL with lifenumber + name attached
-    const equiSyncUrl =
-      "https://madzcoded.github.io/EquiSync/?id=" +
-      encodeURIComponent(lifeNumber) +
-      "&name=" +
-      encodeURIComponent(horseName);
 
     // Open EquiSync in a new tab
     window.open(equiSyncUrl, "_blank");
