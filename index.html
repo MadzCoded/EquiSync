@@ -476,9 +476,11 @@
         const main = document.createElement('div');
         main.className = 'stable-item-main';
 
-        const idLine = document.createElement('div');
-        idLine.className = 'stable-item-id';
-        idLine.textContent = horse.id ? `Horse #${horse.id}` : 'Horse';
+const idLine = document.createElement('div');
+idLine.className = 'stable-item-id';
+idLine.textContent = horse.name
+  ? `${horse.name} (#${horse.id})`
+  : `Horse #${horse.id}`;
 
         const urlLine = document.createElement('div');
         urlLine.className = 'stable-item-url';
