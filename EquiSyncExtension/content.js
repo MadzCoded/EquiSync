@@ -37,9 +37,22 @@ function insertEquiSyncButton() {
   });
 
   btn.addEventListener("click", () => {
-    const horseUrl = window.location.href;
-    alert("EquiSync clicked for:\n" + horseUrl);
-    // later: open your site or send data somewhere
+    // Try to grab lifenumber from URL, e.g. /horses/22238866/
+    const match = window.location.href.match(/horses\/(\d+)/i);
+    if (!match) {
+      alert("EquiSync couldn't find this horse's lifenumber in the URL.");
+      return;
+    }
+
+    const lifeNumber = match[1];
+
+    // Your EquiSync site URL with lifenumber attached
+    const equiSyncUrl =
+      "https://madzcoded.github.io/EquiSync/?horse=" +
+      encodeURIComponent(lifeNumber);
+
+    // Open EquiSync in a new tab
+    window.open(equiSyncUrl, "_blank");
   });
 
   document.body.appendChild(btn);
