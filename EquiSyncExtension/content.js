@@ -47,8 +47,20 @@ function insertEquiSyncButton() {
     const lifeNumber = match[1];
 
     // Extract horse name from the page: <h1 id="name">Horse Name</h1>
-    const nameEl = document.querySelector("h1#name");
-    const horseName = nameEl ? nameEl.innerText.trim() : "Unknown";
+// Get <h1 id="name"> that contains the horse's name
+const nameEl = document.querySelector("h1#name");
+
+// Extract ONLY the text node (exclude icons)
+let horseName = "Unknown";
+if (nameEl) {
+  // Find the first real text node inside the element
+  const textNode = Array.from(nameEl.childNodes)
+    .find(n => n.nodeType === Node.TEXT_NODE);
+
+  if (textNode) {
+    horseName = textNode.textContent.trim();
+  }
+}
 
     // Your EquiSync site URL with lifenumber + name attached
     const equiSyncUrl =
