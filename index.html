@@ -499,31 +499,31 @@
       });
     }
 
-    // ✅ NEW: import from ?horse=123456 in the URL
-    function importHorseFromQuery() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('horse');
-      if (!id) return;
+function importHorseFromQuery() {
+  const params = new URLSearchParams(window.location.search);
 
-      // accept only digits
-      if (!/^\d+$/.test(id)) return;
+  const id = params.get("id");
+  const name = params.get("name");
 
-      const url = `https://horsereality.com/horses/${id}/`;
+  if (!id) return;
 
-      // Avoid duplicates (by URL)
-      if (horses.some((h) => h.url === url)) {
-        return;
-      }
+  const url = `https://horsereality.com/horses/${id}/`;
 
-      const horse = {
-        id,
-        url,
-        addedAt: Date.now()
-      };
+  // Avoid duplicates by ID
+  if (horses.some(h => h.id === id)) {
+    return;
+  }
 
-      horses.push(horse);
-      saveStable();
-    }
+  const horse = {
+    id,
+    name: name || null,
+    url,
+    addedAt: Date.now()
+  };
+
+  horses.push(horse);
+  saveStable();
+}
 
     function handleAdd() {
       const raw = urlInput.value.trim();
