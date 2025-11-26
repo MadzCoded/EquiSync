@@ -482,12 +482,7 @@ idLine.textContent = horse.name
   ? `${horse.name} (#${horse.id})`
   : `Horse #${horse.id}`;
 
-        const urlLine = document.createElement('div');
-        urlLine.className = 'stable-item-url';
-        urlLine.textContent = horse.url;
-
-        main.appendChild(idLine);
-        main.appendChild(urlLine);
+main.appendChild(idLine);
 
         const link = document.createElement('a');
         link.href = horse.url;
