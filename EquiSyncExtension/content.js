@@ -2,59 +2,38 @@
 
 function insertEquiSyncButton() {
   // Avoid duplicates
-  if (document.getElementById("equisync-tab-button")) {
+  if (document.getElementById("equisync-floating-button")) {
     return true;
   }
 
-  // Look for something that visibly says "Edit" in the tab bar area
-  const allElements = Array.from(document.querySelectorAll("*"));
-
-  const editTab = allElements.find((el) => {
-    const text = el.textContent.trim();
-    if (!text.includes("Edit")) return false;
-
-    // Only consider visible elements
-    const style = window.getComputedStyle(el);
-    if (style.display === "none" || style.visibility === "hidden") {
-      return false;
-    }
-
-    // We also want it to be clickable (link or button or looks like a tab)
-    const tag = el.tagName.toLowerCase();
-    if (tag === "a" || tag === "button") return true;
-
-    // Or has a role of tab/button
-    const role = el.getAttribute("role");
-    if (role === "tab" || role === "button") return true;
-
-    return false;
-  });
-
-  if (!editTab) {
-    return false; // not yet found
-  }
-
   const btn = document.createElement("button");
-  btn.id = "equisync-tab-button";
+  btn.id = "equisync-floating-button";
   btn.textContent = "EquiSync";
 
-  // Simple styling to sit beside Edit
-  btn.style.marginLeft = "8px";
-  btn.style.padding = "4px 10px";
-  btn.style.borderRadius = "4px";
-  btn.style.border = "1px solid rgba(255,255,255,0.25)";
+  // Floating bottom-right styling
+  btn.style.position = "fixed";
+  btn.style.right = "20px";
+  btn.style.bottom = "20px";
+  btn.style.zIndex = "9999";
+  btn.style.padding = "10px 16px";
+  btn.style.borderRadius = "999px";
+  btn.style.border = "1px solid rgba(255,255,255,0.4)";
   btn.style.background = "linear-gradient(135deg, #f97316, #facc15)";
-  btn.style.color = "#111";
-  btn.style.fontSize = "12px";
+  btn.style.color = "#111827";
+  btn.style.fontSize = "13px";
   btn.style.fontWeight = "600";
   btn.style.cursor = "pointer";
-  btn.style.whiteSpace = "nowrap";
+  btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
+  btn.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
   btn.addEventListener("mouseover", () => {
-    btn.style.filter = "brightness(1.05)";
+    btn.style.transform = "translateY(-1px)";
+    btn.style.boxShadow = "0 10px 24px rgba(0,0,0,0.5)";
   });
+
   btn.addEventListener("mouseout", () => {
-    btn.style.filter = "none";
+    btn.style.transform = "translateY(0)";
+    btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
   btn.addEventListener("click", () => {
@@ -63,10 +42,7 @@ function insertEquiSyncButton() {
     // later: open your site or send data somewhere
   });
 
-  // Insert right after the Edit tab in its parent container
-  const parent = editTab.parentElement || editTab;
-  parent.insertBefore(btn, editTab.nextSibling);
-
+  document.body.appendChild(btn);
   return true;
 }
 
