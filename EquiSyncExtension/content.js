@@ -37,7 +37,7 @@ function insertEquiSyncButton() {
   });
 
   btn.addEventListener("click", () => {
-    // Try to grab lifenumber from URL, e.g. /horses/22238866/
+    // Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
     if (!match) {
       alert("EquiSync couldn't find this horse's lifenumber in the URL.");
@@ -46,10 +46,16 @@ function insertEquiSyncButton() {
 
     const lifeNumber = match[1];
 
-    // Your EquiSync site URL with lifenumber attached
+    // Extract horse name from the page: <h1 id="name">Horse Name</h1>
+    const nameEl = document.querySelector("h1#name");
+    const horseName = nameEl ? nameEl.innerText.trim() : "Unknown";
+
+    // Your EquiSync site URL with lifenumber + name attached
     const equiSyncUrl =
-      "https://madzcoded.github.io/EquiSync/?horse=" +
-      encodeURIComponent(lifeNumber);
+      "https://madzcoded.github.io/EquiSync/?id=" +
+      encodeURIComponent(lifeNumber) +
+      "&name=" +
+      encodeURIComponent(horseName);
 
     // Open EquiSync in a new tab
     window.open(equiSyncUrl, "_blank");
