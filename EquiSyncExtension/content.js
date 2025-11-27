@@ -144,8 +144,10 @@ function injectStableIntoPage() {
     );
     script.remove();
 
-    // Clear the buffer so removed horses don't come back later
-    chrome.storage.local.set({ [STORAGE_KEY]: [] });
+    // Clear after a short delay to ensure the page merged everything
+setTimeout(() => {
+  chrome.storage.local.set({ [STORAGE_KEY]: [] });
+}, 500);
   });
 }
 
