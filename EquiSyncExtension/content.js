@@ -119,43 +119,26 @@ function insertEquiSyncButton() {
 
 // ---------- EQUISYNC SITE MODE ----------
 
-function injectStableIntoPage() {
+// Bridge: send extension buffer → page via window.postMessage
+function sendBufferToEquiSyncPage() {
   if (!onEquiSyncSite()) return;
 
   chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
     const horses = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
+    if (!horses.length) return;
 
-    if (!horses.length) {
-      return;
-    }
-
-    // Inject script that tries repeatedly to call window.mergeExtensionHorses
-    const script = document.createElement("script");
-    script.textContent = `
-      (function () {
-        const horsesFromExtension = ${JSON.stringify(horses)};
-        if (!Array.isArray(horsesFromExtension) || !horsesFromExtension.length) return;
-
-        function tryMerge() {
-          if (window.mergeExtensionHorses) {
-            window.mergeExtensionHorses(horsesFromExtension);
-            clearInterval(timer);
-          }
-        }
-
-        const timer = setInterval(tryMerge, 200);
-        tryMerge();
-      })();
-    `;
-    (document.documentElement || document.head || document.body).appendChild(
-      script
+    // Post message into the page context
+    window.postMessage(
+      {
+        source: "EquiSyncExtension",
+        type: "EQUISYNC_HORSES",
+        horses
+      },
+      "*"
     );
-    script.remove();
 
-    // Clear the buffer *after* giving the page time to merge
-    setTimeout(() => {
-      chrome.storage.local.set({ [STORAGE_KEY]: [] });
-    }, 2000);
+    // Clear the buffer so they don't get re-injected next time
+    chrome.storage.local.set({ [STORAGE_KEY]: [] });
   });
 }
 
@@ -176,7 +159,7 @@ function setup() {
   }
 
   if (onEquiSyncSite()) {
-    injectStableIntoPage();
+    sendBufferToEquiSyncPage();
   }
 }
 
