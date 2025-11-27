@@ -481,6 +481,7 @@
     const addBtn = document.getElementById('add-horse-btn');
     const emptyMsg = document.getElementById('stable-empty');
     const listEl = document.getElementById('stable-items');
+    const clearAllBtn = document.getElementById('clear-all-btn');
 
     let horses = [];
 
@@ -641,6 +642,21 @@ function importHorseFromQuery() {
 
     if (addBtn) {
       addBtn.addEventListener('click', handleAdd);
+    }
+
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener('click', () => {
+        if (!horses.length) return;
+
+        const ok = confirm(
+          'Clear all horses from your EquiSync stable? This cannot be undone.'
+        );
+        if (!ok) return;
+
+        horses = [];
+        saveStable();
+        renderStable();
+      });
     }
 
     // ✅ Order matters: load → import from query → render
