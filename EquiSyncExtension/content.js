@@ -107,8 +107,8 @@ function insertEquiSyncButton() {
       existing.push(horse);
 
       chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-        // Quiet success (no popup) or keep a tiny alert if you like
-        // alert(`Added to EquiSync: ${horse.name} (#${horse.id})`);
+        // Silent success
+        // console.log("EquiSync: stored horse in extension buffer", horse);
       });
     });
   });
@@ -125,18 +125,26 @@ function injectStableIntoPage() {
   chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
     const horses = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
 
-    // Inject a script that calls a page function to merge horses
+    if (!horses.length) {
+      return;
+    }
+
+    // Inject script that tries repeatedly to call window.mergeExtensionHorses
     const script = document.createElement("script");
     script.textContent = `
       (function () {
         const horsesFromExtension = ${JSON.stringify(horses)};
-        if (Array.isArray(horsesFromExtension) && horsesFromExtension.length) {
+        if (!Array.isArray(horsesFromExtension) || !horsesFromExtension.length) return;
+
+        function tryMerge() {
           if (window.mergeExtensionHorses) {
             window.mergeExtensionHorses(horsesFromExtension);
-          } else {
-            window.__EQUISYNC_FROM_EXTENSION__ = horsesFromExtension;
+            clearInterval(timer);
           }
         }
+
+        const timer = setInterval(tryMerge, 200);
+        tryMerge();
       })();
     `;
     (document.documentElement || document.head || document.body).appendChild(
@@ -144,10 +152,10 @@ function injectStableIntoPage() {
     );
     script.remove();
 
-    // Clear after a short delay to ensure the page merged everything
-setTimeout(() => {
-  chrome.storage.local.set({ [STORAGE_KEY]: [] });
-}, 500);
+    // Clear the buffer *after* giving the page time to merge
+    setTimeout(() => {
+      chrome.storage.local.set({ [STORAGE_KEY]: [] });
+    }, 2000);
   });
 }
 
