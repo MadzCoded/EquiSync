@@ -86,14 +86,23 @@ function insertEquiSyncButton() {
       horseName = `Horse #${lifeNumber}`;
     }
 
+    // 3) Extract sex from the small icon (RealTools-style)
+    // Example: <img class="icon16" alt="Mare"> or "Stallion" / "Gelding"
+    let sex = null;
+    const sexImg = document.querySelector("img.icon16");
+    if (sexImg && sexImg.alt) {
+      sex = sexImg.alt.trim(); // "Mare", "Stallion", "Gelding", etc.
+    }
+
     const horse = {
       id: lifeNumber,
       name: horseName,
+      sex: sex,                 // ✅ NEW FIELD
       url: window.location.href,
       addedAt: Date.now()
     };
 
-    // 3) Save into chrome.storage as a "buffer"
+    // 4) Save into chrome.storage as a "buffer"
     chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
       const existing = Array.isArray(data[STORAGE_KEY])
         ? data[STORAGE_KEY]
@@ -107,8 +116,7 @@ function insertEquiSyncButton() {
       existing.push(horse);
 
       chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-        // Silent success
-        // console.log("EquiSync: stored horse in extension buffer", horse);
+        // silent success
       });
     });
   });
