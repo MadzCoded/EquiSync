@@ -506,27 +506,6 @@
       } catch (e) {
         console.error('Failed to load stable', e);
       }
-
-      // Also support ?id=...&name=... links (old style)
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
-        const name = params.get('name');
-        if (id) {
-          const url = `https://horsereality.com/horses/${id}/`;
-          if (!horses.some(h => h.id === id)) {
-            horses.push({
-              id,
-              name: name || null,
-              url,
-              addedAt: Date.now()
-            });
-            saveStable();
-          }
-        }
-      } catch (e) {
-        console.error('Failed to import from query', e);
-      }
     }
 
     function renderStable() {
@@ -556,9 +535,7 @@
         main.appendChild(idLine);
 
         const actions = document.createElement('div');
-        actions.style.display = 'flex';
-        actions.style.gap = '0.5rem';
-        actions.style.alignItems = 'center';
+        actions.className = 'stable-actions';
 
         const link = document.createElement('a');
         link.href = horse.url;
@@ -568,13 +545,7 @@
 
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
-        removeBtn.style.border = '1px solid rgba(248, 113, 113, 0.5)';
-        removeBtn.style.borderRadius = '999px';
-        removeBtn.style.padding = '0.25rem 0.7rem';
-        removeBtn.style.background = 'rgba(15, 23, 42, 0.9)';
-        removeBtn.style.color = '#fca5a5';
-        removeBtn.style.fontSize = '0.75rem';
-        removeBtn.style.cursor = 'pointer';
+        removeBtn.className = 'stable-delete';
 
         removeBtn.addEventListener('click', () => {
           horses = horses.filter(h => h.id !== horse.id);
@@ -649,7 +620,7 @@
       renderStable();
     }
 
-    // This is what the extension calls via injected script
+    // Called from the extension’s injected script
     function mergeExtensionHorses(fromExt) {
       if (!Array.isArray(fromExt) || !fromExt.length) return;
 
@@ -666,7 +637,7 @@
       renderStable();
     }
 
-    // Expose to window so the injected script can call it
+    // Expose merge function globally for the extension
     window.mergeExtensionHorses = mergeExtensionHorses;
 
     if (addBtn) {
@@ -676,7 +647,7 @@
       clearBtn.addEventListener('click', handleClearAll);
     }
 
-    // Initialise
+    // Initialise with whatever is in localStorage
     loadStable();
     renderStable();
   })();
