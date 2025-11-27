@@ -1,6 +1,31 @@
 // content.js
 
+// ---------- Helpers ----------
+
+// Simple host checks
+function onHorseReality() {
+  return (
+    location.hostname === "horsereality.com" ||
+    location.hostname === "www.horsereality.com"
+  );
+}
+
+function onEquiSyncSite() {
+  return (
+    location.hostname === "madzcoded.github.io" &&
+    location.pathname.startsWith("/EquiSync")
+  );
+}
+
+// Key we'll use in chrome.storage
+const STORAGE_KEY = "equisyncStable";
+
+
+// ---------- HORSE REALITY MODE ----------
+
 function insertEquiSyncButton() {
+  if (!onHorseReality()) return false;
+
   // Avoid duplicates
   if (document.getElementById("equisync-floating-button")) {
     return true;
@@ -37,9 +62,9 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-  // When the EquiSync button is clicked
+  // When the EquiSync button is clicked on HR
   btn.addEventListener("click", () => {
-    // 1) Extract lifenumber from URL, e.g. /horses/22238866/
+    // Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
     if (!match) {
       alert("EquiSync couldn't find this horse's lifenumber in the URL.");
@@ -47,57 +72,97 @@ function insertEquiSyncButton() {
     }
     const lifeNumber = match[1];
 
-    // 2) Extract horse name from the PAGE TITLE
-    // RealTools-style: d.title.replace(/ - Horse Reality$/, '')
+    // Get horse name from page title (similar to RealTools)
     let horseName = "Unknown";
     const title = document.title || "";
 
     if (title) {
-      // Try to strip " - Horse Reality" at the end
       horseName = title.replace(/\s*-\s*Horse Reality\s*$/i, "").trim();
-
-      // If that didn't actually change anything, fall back to taking text before first " - "
       if (!horseName || horseName === title) {
         horseName = title.split(" - ")[0].trim();
       }
-
-      // If still empty for some reason, fall back to the full title
       if (!horseName) {
         horseName = title.trim();
       }
     }
-
-    // As a final fallback, if everything failed, at least label by ID
     if (!horseName) {
       horseName = `Horse #${lifeNumber}`;
     }
 
-    // 3) Build your EquiSync URL with id + name
-    const equiSyncUrl =
-      "https://madzcoded.github.io/EquiSync/?id=" +
-      encodeURIComponent(lifeNumber) +
-      "&name=" +
-      encodeURIComponent(horseName);
+    const horse = {
+      id: lifeNumber,
+      name: horseName,
+      url: window.location.href,
+      addedAt: Date.now()
+    };
 
-    // 4) Open EquiSync in a new tab
-    window.open(equiSyncUrl, "_blank");
+    // Save into chrome.storage (no tab opening)
+    chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
+      const existing = Array.isArray(data[STORAGE_KEY])
+        ? data[STORAGE_KEY]
+        : [];
+
+      if (existing.some((h) => h.id === horse.id)) {
+        alert("This horse is already in your EquiSync stable.");
+        return;
+      }
+
+      existing.push(horse);
+
+      chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
+        // Tiny confirmation – later you can make this a nicer toast
+        alert(`Added to EquiSync: ${horse.name} (#${horse.id})`);
+      });
+    });
   });
 
   document.body.appendChild(btn);
   return true;
 }
 
-function setup() {
-  let attempts = 0;
-  const maxAttempts = 12;
 
-  const interval = setInterval(() => {
-    attempts++;
-    const ok = insertEquiSyncButton();
-    if (ok || attempts >= maxAttempts) {
-      clearInterval(interval);
-    }
-  }, 500);
+// ---------- EQUISYNC SITE MODE ----------
+
+function injectStableIntoPage() {
+  if (!onEquiSyncSite()) return;
+
+  // Get horses from chrome.storage and expose them to the page JS
+  chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
+    const horses = Array.isArray(data[STORAGE_KEY])
+      ? data[STORAGE_KEY]
+      : [];
+
+    const script = document.createElement("script");
+    script.textContent = `
+      window.__EQUISYNC_FROM_EXTENSION__ = ${JSON.stringify(horses)};
+    `;
+    (document.documentElement || document.head || document.body).appendChild(
+      script
+    );
+    script.remove();
+  });
+}
+
+
+// ---------- Setup ----------
+
+function setup() {
+  if (onHorseReality()) {
+    let attempts = 0;
+    const maxAttempts = 12;
+
+    const interval = setInterval(() => {
+      attempts++;
+      const ok = insertEquiSyncButton();
+      if (ok || attempts >= maxAttempts) {
+        clearInterval(interval);
+      }
+    }, 500);
+  }
+
+  if (onEquiSyncSite()) {
+    injectStableIntoPage();
+  }
 }
 
 if (document.readyState === "loading") {
