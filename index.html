@@ -620,7 +620,7 @@
       renderStable();
     }
 
-    // Called from the extension’s injected script
+    // Merge horses coming from the extension
     function mergeExtensionHorses(fromExt) {
       if (!Array.isArray(fromExt) || !fromExt.length) return;
 
@@ -637,8 +637,20 @@
       renderStable();
     }
 
-    // Expose merge function globally for the extension
+    // Expose to window (just in case we ever call it directly)
     window.mergeExtensionHorses = mergeExtensionHorses;
+
+    // Listen for postMessage from the extension content script
+    window.addEventListener('message', (event) => {
+      if (event.source !== window) return;
+      const data = event.data;
+      if (!data || data.source !== 'EquiSyncExtension') return;
+      if (data.type !== 'EQUISYNC_HORSES') return;
+
+      if (Array.isArray(data.horses)) {
+        mergeExtensionHorses(data.horses);
+      }
+    });
 
     if (addBtn) {
       addBtn.addEventListener('click', handleAdd);
@@ -647,7 +659,7 @@
       clearBtn.addEventListener('click', handleClearAll);
     }
 
-    // Initialise with whatever is in localStorage
+    // Initialise with whatever is already in localStorage
     loadStable();
     renderStable();
   })();
