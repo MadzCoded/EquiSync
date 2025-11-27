@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
   "name": "EquiSync – Horse Reality Helper",
-  "version": "0.2.0",
-  "description": "Adds an EquiSync helper button on Horse Reality horse pages.",
+  "version": "0.3.0",
+  "description": "EquiSync helper for Horse Reality.",
   "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": [
         "*://horsereality.com/horses/*",
         "*://www.horsereality.com/horses/*",
-        "https://madzcoded.github.io/EquiSync/*"
+        "https://madzcoded.github.io/*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
