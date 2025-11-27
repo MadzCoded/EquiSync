@@ -486,15 +486,38 @@
     let horses = [];
 
     function loadStable() {
+      // 1) Load from localStorage (what the site itself saved)
       try {
         const raw = localStorage.getItem('equisyncStable');
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          horses = parsed;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            horses = parsed;
+          }
         }
       } catch (e) {
-        console.error('Failed to load stable', e);
+        console.error('Failed to load stable from localStorage', e);
+      }
+
+      // 2) If the extension injected data, merge it in (by id)
+      try {
+        const fromExtension = window.__EQUISYNC_FROM_EXTENSION__;
+        if (Array.isArray(fromExtension) && fromExtension.length) {
+          const byId = new Map(horses.map((h) => [h.id, h]));
+
+          fromExtension.forEach((h) => {
+            if (!h || !h.id) return;
+            if (!byId.has(h.id)) {
+              horses.push(h);
+              byId.set(h.id, h);
+            }
+          });
+
+          // Save merged result back to localStorage so it's persisted
+          localStorage.setItem('equisyncStable', JSON.stringify(horses));
+        }
+      } catch (e) {
+        console.error('Failed to merge stable from extension', e);
       }
     }
 
