@@ -24,7 +24,8 @@ function insertEquiSyncButton() {
   btn.style.fontWeight = "600";
   btn.style.cursor = "pointer";
   btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
-  btn.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  btn.style.fontFamily =
+    "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
   btn.addEventListener("mouseover", () => {
     btn.style.transform = "translateY(-1px)";
@@ -36,39 +37,40 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-btn.addEventListener("click", () => {
-    // 1. Extract lifenumber
+  // 🔹 When the EquiSync button is clicked
+  btn.addEventListener("click", () => {
+    // 1) Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
     if (!match) {
-        alert("EquiSync couldn't find this horse's lifenumber in the URL.");
-        return;
+      alert("EquiSync couldn't find this horse's lifenumber in the URL.");
+      return;
     }
     const lifeNumber = match[1];
 
-    // 2. Extract horse name using RealTools method (window.horse)
+    // 2) Extract horse name from the PAGE TITLE
+    // Realtools does: d.title.replace(/ - Horse Reality$/, '')
     let horseName = "Unknown";
+    const title = document.title || "";
 
-    if (window.horse && window.horse.name) {
-        horseName = window.horse.name.trim();
-    } else {
-        // fallback if Realtools hasn't loaded
-        const nameEl = document.querySelector("h1#name");
-        if (nameEl) {
-            const textNode = [...nameEl.childNodes].find(n => n.nodeType === Node.TEXT_NODE);
-            if (textNode) horseName = textNode.textContent.trim();
-        }
+    if (title) {
+      // Remove the " - Horse Reality" suffix or anything after " - "
+      horseName = title.replace(/\s*-\s*Horse Reality\s*$/i, "").trim();
+      // As a fallback, if that didn't change anything, just strip anything after first " - "
+      if (!horseName || horseName === title) {
+        horseName = title.split(" - ")[0].trim();
+      }
     }
 
-    // 3. Build the redirect URL
+    // 3) Build your EquiSync URL with id + name
     const equiSyncUrl =
-        "https://madzcoded.github.io/EquiSync/?id=" +
-        encodeURIComponent(lifeNumber) +
-        "&name=" +
-        encodeURIComponent(horseName);
+      "https://madzcoded.github.io/EquiSync/?id=" +
+      encodeURIComponent(lifeNumber) +
+      "&name=" +
+      encodeURIComponent(horseName || "Unknown");
 
-    // 4. Open EquiSync in a new tab
+    // 4) Open EquiSync in a new tab
     window.open(equiSyncUrl, "_blank");
-});
+  });
 
   document.body.appendChild(btn);
   return true;
