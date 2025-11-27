@@ -119,35 +119,106 @@ function insertEquiSyncButton() {
       horseName = `Horse #${lifeNumber}`;
     }
 
-    // 3) Extract sex from the small icon
+  btn.addEventListener("click", () => {
+    // 1) Extract lifenumber from URL, e.g. /horses/22238866/
+    const match = window.location.href.match(/horses\/(\d+)/i);
+    if (!match) {
+      alert("EquiSync couldn't find this horse's lifenumber in the URL.");
+      return;
+    }
+    const lifeNumber = match[1];
+
+    // 2) Extract horse name from the page title
+    let horseName = "Unknown";
+    const title = document.title || "";
+
+    if (title) {
+      horseName = title.replace(/\s*-\s*Horse Reality\s*$/i, "").trim();
+      if (!horseName || horseName === title) {
+        horseName = title.split(" - ")[0].trim();
+      }
+      if (!horseName) {
+        horseName = title.trim();
+      }
+    }
+
+    if (!horseName) {
+      horseName = `Horse #${lifeNumber}`;
+    }
+
+    // 3) Sex from the small icon (Mare/Stallion/Gelding)
     let sex = null;
     const sexImg = document.querySelector("img.icon16");
     if (sexImg && sexImg.alt) {
-      sex = sexImg.alt.trim(); // "Mare", "Stallion", "Gelding", etc.
+      sex = sexImg.alt.trim();
     }
 
-    // 4) Extra fields from the info table
-    // These labels may differ slightly; tweak if HR uses other wording.
-    const breed    = getInfoValue("breed");
-    const birthday = getInfoValue("born") || getInfoValue("birthday");
-    const owner    = getInfoValue("owned by") || getInfoValue("owner");
-    const breeder  = getInfoValue("bred by") || getInfoValue("breeder");
-    const location = getInfoValue("location");
+    // 4) Extra info from the Info table + breed
+    let breed = null;
+    let birthday = null;
+    let owner = null;
+    let breeder = null;
+    let location = null;
 
+    // a) Breed: <p id="breed">Kathiawari Horse</p>
+    const breedEl = document.querySelector("p#breed");
+    if (breedEl && breedEl.textContent.trim()) {
+      breed = breedEl.textContent.trim();
+    }
+
+    // b) Info rows: Birthday, Owner, Breeder, Location, etc.
+    const infoRows = document.querySelectorAll(".info_table_row");
+    infoRows.forEach((row) => {
+      const labelEl = row.querySelector(".info_label");
+      const itemEl = row.querySelector(".info_item");
+      if (!labelEl || !itemEl) return;
+
+      const label = labelEl.textContent.trim();
+      const valueText = itemEl.textContent.trim();
+
+      switch (label) {
+        case "Birthday":
+          birthday = valueText || null;
+          break;
+
+        case "Location":
+          location = valueText || null;
+          break;
+
+        case "Owner": {
+          const ownerLink = itemEl.querySelector("a");
+          const ownerName = ownerLink ? ownerLink.textContent.trim() : null;
+          owner = ownerName || valueText || null;
+          break;
+        }
+
+        case "Breeder": {
+          const breederLink = itemEl.querySelector("a");
+          const breederName = breederLink ? breederLink.textContent.trim() : null;
+          breeder = breederName || valueText || null;
+          break;
+        }
+
+        default:
+          break;
+      }
+    });
+
+    // 5) Build the horse object with all fields
     const horse = {
       id: lifeNumber,
       name: horseName,
-      sex: sex || null,
-      breed: breed || null,
-      birthday: birthday || null,
-      owner: owner || null,
-      breeder: breeder || null,
-      location: location || null,
+      sex,
+      breed,
+      birthday,
+      owner,
+      breeder,
+      location,
       url: window.location.href,
       addedAt: Date.now()
     };
 
-    // 5) Save into chrome.storage as a buffer
+    // 6) Save into chrome.storage as a "buffer"
     chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
       const existing = Array.isArray(data[STORAGE_KEY])
         ? data[STORAGE_KEY]
