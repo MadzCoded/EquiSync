@@ -337,6 +337,29 @@
   text-decoration: underline;
 }
 
+.stable-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stable-delete {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  background: rgba(15, 23, 42, 0.85);
+  color: #fecaca;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.stable-delete:hover {
+  background: rgba(248, 113, 113, 0.22);
+  border-color: rgb(248, 113, 113);
+  color: #fee2e2;
+}
+
     .add-horse-btn {
   margin-top: 0.3rem;
   padding: 0.8rem 1.2rem;
@@ -469,29 +492,54 @@
 
       emptyMsg.style.display = 'none';
 
-      horses.forEach((horse) => {
+      horses.forEach((horse, index) => {
         const li = document.createElement('li');
         li.className = 'stable-item';
 
         const main = document.createElement('div');
         main.className = 'stable-item-main';
 
-const idLine = document.createElement('div');
-idLine.className = 'stable-item-id';
-idLine.textContent = horse.name
-  ? `${horse.name} (#${horse.id})`
-  : `Horse #${horse.id}`;
+        const idLine = document.createElement('div');
+        idLine.className = 'stable-item-id';
+        idLine.textContent = horse.name
+          ? `${horse.name} (#${horse.id})`
+          : `Horse #${horse.id || 'unknown'}`;
 
-main.appendChild(idLine);
+        main.appendChild(idLine);
 
+        // Actions container (Open + Remove)
+        const actions = document.createElement('div');
+        actions.className = 'stable-actions';
+
+        // "Open" link
         const link = document.createElement('a');
         link.href = horse.url;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
         link.textContent = 'Open';
 
+        // "Remove" button
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'stable-delete';
+        removeBtn.textContent = 'Remove';
+
+        removeBtn.addEventListener('click', () => {
+          const ok = confirm(
+            `Remove ${horse.name || 'this horse'} from your EquiSync stable?`
+          );
+          if (!ok) return;
+
+          // Remove this horse by index
+          horses.splice(index, 1);
+          saveStable();
+          renderStable();
+        });
+
+        actions.appendChild(link);
+        actions.appendChild(removeBtn);
+
         li.appendChild(main);
-        li.appendChild(link);
+        li.appendChild(actions);
         listEl.appendChild(li);
       });
     }
