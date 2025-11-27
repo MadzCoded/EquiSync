@@ -2,7 +2,6 @@
 
 // ---------- Helpers ----------
 
-// Simple host checks
 function onHorseReality() {
   return (
     location.hostname === "horsereality.com" ||
@@ -17,9 +16,7 @@ function onEquiSyncSite() {
   );
 }
 
-// Key we'll use in chrome.storage
 const STORAGE_KEY = "equisyncStable";
-
 
 // ---------- HORSE REALITY MODE ----------
 
@@ -62,9 +59,8 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-  // When the EquiSync button is clicked on HR
   btn.addEventListener("click", () => {
-    // Extract lifenumber from URL, e.g. /horses/22238866/
+    // 1) Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
     if (!match) {
       alert("EquiSync couldn't find this horse's lifenumber in the URL.");
@@ -72,7 +68,7 @@ function insertEquiSyncButton() {
     }
     const lifeNumber = match[1];
 
-    // Get horse name from page title (similar to RealTools)
+    // 2) Extract horse name from the page title
     let horseName = "Unknown";
     const title = document.title || "";
 
@@ -85,6 +81,7 @@ function insertEquiSyncButton() {
         horseName = title.trim();
       }
     }
+
     if (!horseName) {
       horseName = `Horse #${lifeNumber}`;
     }
@@ -96,7 +93,7 @@ function insertEquiSyncButton() {
       addedAt: Date.now()
     };
 
-    // Save into chrome.storage (no tab opening)
+    // 3) Save into chrome.storage as a "buffer"
     chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
       const existing = Array.isArray(data[STORAGE_KEY])
         ? data[STORAGE_KEY]
@@ -109,9 +106,10 @@ function insertEquiSyncButton() {
 
       existing.push(horse);
 
-chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-  // No popup – quiet add
-});
+      chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
+        // Quiet success (no popup) or keep a tiny alert if you like
+        // alert(`Added to EquiSync: ${horse.name} (#${horse.id})`);
+      });
     });
   });
 
@@ -119,29 +117,37 @@ chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
   return true;
 }
 
-
 // ---------- EQUISYNC SITE MODE ----------
 
 function injectStableIntoPage() {
   if (!onEquiSyncSite()) return;
 
-  // Get horses from chrome.storage and expose them to the page JS
   chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
-    const horses = Array.isArray(data[STORAGE_KEY])
-      ? data[STORAGE_KEY]
-      : [];
+    const horses = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
 
+    // Inject a script that calls a page function to merge horses
     const script = document.createElement("script");
     script.textContent = `
-      window.__EQUISYNC_FROM_EXTENSION__ = ${JSON.stringify(horses)};
+      (function () {
+        const horsesFromExtension = ${JSON.stringify(horses)};
+        if (Array.isArray(horsesFromExtension) && horsesFromExtension.length) {
+          if (window.mergeExtensionHorses) {
+            window.mergeExtensionHorses(horsesFromExtension);
+          } else {
+            window.__EQUISYNC_FROM_EXTENSION__ = horsesFromExtension;
+          }
+        }
+      })();
     `;
     (document.documentElement || document.head || document.body).appendChild(
       script
     );
     script.remove();
+
+    // Clear the buffer so removed horses don't come back later
+    chrome.storage.local.set({ [STORAGE_KEY]: [] });
   });
 }
-
 
 // ---------- Setup ----------
 
