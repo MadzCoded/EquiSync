@@ -86,23 +86,75 @@ function insertEquiSyncButton() {
       horseName = `Horse #${lifeNumber}`;
     }
 
-    // 3) Extract sex from the small icon (RealTools-style)
-    // Example: <img class="icon16" alt="Mare"> or "Stallion" / "Gelding"
+    // 3) Extract sex from the small icon (Realtools-style)
     let sex = null;
     const sexImg = document.querySelector("img.icon16");
     if (sexImg && sexImg.alt) {
       sex = sexImg.alt.trim(); // "Mare", "Stallion", "Gelding", etc.
     }
 
+    // 4) Extract extra info from the .infotext table (breed, birthday, owner, breeder, location)
+    let breed = null;
+    let birthday = null;
+    let ownerName = null;
+    let ownerUrl = null;
+    let breederName = null;
+    let breederUrl = null;
+    let locationText = null;
+
+    const leftCells = document.querySelectorAll(".infotext .left");
+    const rightCells = document.querySelectorAll(".infotext .right");
+
+    if (leftCells.length === rightCells.length && leftCells.length > 0) {
+      for (let i = 0; i < leftCells.length; i++) {
+        let label = leftCells[i].textContent || "";
+        label = label.replace(":", "").trim().toLowerCase();
+
+        const valueEl = rightCells[i];
+        const valueText = (valueEl.textContent || "").trim();
+
+        if (label === "breed") {
+          breed = valueText || null;
+        } else if (label === "birthday") {
+          birthday = valueText || null;
+        } else if (label === "owner") {
+          const a = valueEl.querySelector("a");
+          if (a) {
+            ownerName = a.textContent.trim();
+            ownerUrl = a.href;
+          } else {
+            ownerName = valueText || null;
+          }
+        } else if (label === "breeder") {
+          const a = valueEl.querySelector("a");
+          if (a) {
+            breederName = a.textContent.trim();
+            breederUrl = a.href;
+          } else {
+            breederName = valueText || null;
+          }
+        } else if (label === "location") {
+          locationText = valueText || null;
+        }
+      }
+    }
+
     const horse = {
       id: lifeNumber,
       name: horseName,
-      sex: sex,                 // ✅ NEW FIELD
+      sex: sex,
+      breed: breed,
+      birthday: birthday,
+      ownerName: ownerName,
+      ownerUrl: ownerUrl,
+      breederName: breederName,
+      breederUrl: breederUrl,
+      location: locationText,
       url: window.location.href,
       addedAt: Date.now()
     };
 
-    // 4) Save into chrome.storage as a "buffer"
+    // 5) Save into chrome.storage as a "buffer"
     chrome.storage.local.get({ [STORAGE_KEY]: [] }, (data) => {
       const existing = Array.isArray(data[STORAGE_KEY])
         ? data[STORAGE_KEY]
@@ -135,7 +187,6 @@ function sendBufferToEquiSyncPage() {
     const horses = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
     if (!horses.length) return;
 
-    // Post message into the page context
     window.postMessage(
       {
         source: "EquiSyncExtension",
