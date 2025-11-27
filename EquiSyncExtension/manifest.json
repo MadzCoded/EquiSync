@@ -1,16 +1,24 @@
+my new manifest.json
+
+
 {
   "manifest_version": 3,
   "name": "EquiSync – Horse Reality Helper",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "EquiSync helper for Horse Reality.",
   "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": [
         "*://horsereality.com/horses/*",
-        "*://www.horsereality.com/horses/*",
-        "https://madzcoded.github.io/EquiSync/*"
+        "*://www.horsereality.com/horses/*"
       ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://madzcoded.github.io/EquiSync/*"],
+      "exclude_matches": ["https://madzcoded.github.io/EquiSync/assets/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
