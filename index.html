@@ -481,51 +481,51 @@
     const addBtn = document.getElementById('add-horse-btn');
     const emptyMsg = document.getElementById('stable-empty');
     const listEl = document.getElementById('stable-items');
-    const clearAllBtn = document.getElementById('clear-all-btn');
+    const clearBtn = document.getElementById('stable-clear-btn'); // if present
 
     let horses = [];
 
-    function loadStable() {
-      // 1) Load from localStorage (what the site itself saved)
-      try {
-        const raw = localStorage.getItem('equisyncStable');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            horses = parsed;
-          }
-        }
-      } catch (e) {
-        console.error('Failed to load stable from localStorage', e);
-      }
-
-      // 2) If the extension injected data, merge it in (by id)
-      try {
-        const fromExtension = window.__EQUISYNC_FROM_EXTENSION__;
-        if (Array.isArray(fromExtension) && fromExtension.length) {
-          const byId = new Map(horses.map((h) => [h.id, h]));
-
-          fromExtension.forEach((h) => {
-            if (!h || !h.id) return;
-            if (!byId.has(h.id)) {
-              horses.push(h);
-              byId.set(h.id, h);
-            }
-          });
-
-          // Save merged result back to localStorage so it's persisted
-          localStorage.setItem('equisyncStable', JSON.stringify(horses));
-        }
-      } catch (e) {
-        console.error('Failed to merge stable from extension', e);
-      }
-    }
+    const STORAGE_KEY = 'equisyncStable';
 
     function saveStable() {
       try {
-        localStorage.setItem('equisyncStable', JSON.stringify(horses));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(horses));
       } catch (e) {
         console.error('Failed to save stable', e);
+      }
+    }
+
+    function loadStable() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          horses = parsed;
+        }
+      } catch (e) {
+        console.error('Failed to load stable', e);
+      }
+
+      // Also support ?id=...&name=... links (old style)
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const name = params.get('name');
+        if (id) {
+          const url = `https://horsereality.com/horses/${id}/`;
+          if (!horses.some(h => h.id === id)) {
+            horses.push({
+              id,
+              name: name || null,
+              url,
+              addedAt: Date.now()
+            });
+            saveStable();
+          }
+        }
+      } catch (e) {
+        console.error('Failed to import from query', e);
       }
     }
 
@@ -540,7 +540,7 @@
 
       emptyMsg.style.display = 'none';
 
-      horses.forEach((horse, index) => {
+      horses.forEach((horse) => {
         const li = document.createElement('li');
         li.className = 'stable-item';
 
@@ -551,34 +551,33 @@
         idLine.className = 'stable-item-id';
         idLine.textContent = horse.name
           ? `${horse.name} (#${horse.id})`
-          : `Horse #${horse.id || 'unknown'}`;
+          : `Horse #${horse.id}`;
 
         main.appendChild(idLine);
 
-        // Actions container (Open + Remove)
         const actions = document.createElement('div');
-        actions.className = 'stable-actions';
+        actions.style.display = 'flex';
+        actions.style.gap = '0.5rem';
+        actions.style.alignItems = 'center';
 
-        // "Open" link
         const link = document.createElement('a');
         link.href = horse.url;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
         link.textContent = 'Open';
 
-        // "Remove" button
         const removeBtn = document.createElement('button');
-        removeBtn.className = 'stable-delete';
         removeBtn.textContent = 'Remove';
+        removeBtn.style.border = '1px solid rgba(248, 113, 113, 0.5)';
+        removeBtn.style.borderRadius = '999px';
+        removeBtn.style.padding = '0.25rem 0.7rem';
+        removeBtn.style.background = 'rgba(15, 23, 42, 0.9)';
+        removeBtn.style.color = '#fca5a5';
+        removeBtn.style.fontSize = '0.75rem';
+        removeBtn.style.cursor = 'pointer';
 
         removeBtn.addEventListener('click', () => {
-          const ok = confirm(
-            `Remove ${horse.name || 'this horse'} from your EquiSync stable?`
-          );
-          if (!ok) return;
-
-          // Remove this horse by index
-          horses.splice(index, 1);
+          horses = horses.filter(h => h.id !== horse.id);
           saveStable();
           renderStable();
         });
@@ -591,32 +590,6 @@
         listEl.appendChild(li);
       });
     }
-
-function importHorseFromQuery() {
-  const params = new URLSearchParams(window.location.search);
-
-  const id = params.get("id");
-  const name = params.get("name");
-
-  if (!id) return;
-
-  const url = `https://horsereality.com/horses/${id}/`;
-
-  // Avoid duplicates by ID
-  if (horses.some(h => h.id === id)) {
-    return;
-  }
-
-  const horse = {
-    id,
-    name: name || null,
-    url,
-    addedAt: Date.now()
-  };
-
-  horses.push(horse);
-  saveStable();
-}
 
     function handleAdd() {
       const raw = urlInput.value.trim();
@@ -633,7 +606,6 @@ function importHorseFromQuery() {
         return;
       }
 
-      // Optional: enforce Horse Reality domain
       if (!url.hostname.includes('horsereality')) {
         const proceed = confirm(
           'This URL is not from horsereality.com. Add it anyway?'
@@ -641,18 +613,22 @@ function importHorseFromQuery() {
         if (!proceed) return;
       }
 
-      // Try to extract horse ID from URL (e.g. /horses/123456)
       const match = url.href.match(/horses\/(\d+)/i);
       const id = match ? match[1] : null;
 
-      // Prevent duplicates
-      if (horses.some((h) => h.url === url.href)) {
+      if (!id) {
+        alert('Could not find a horse ID in that URL.');
+        return;
+      }
+
+      if (horses.some((h) => h.id === id)) {
         alert('This horse is already in your stable list.');
         return;
       }
 
       const horse = {
         id,
+        name: null,
         url: url.href,
         addedAt: Date.now()
       };
@@ -663,28 +639,45 @@ function importHorseFromQuery() {
       urlInput.value = '';
     }
 
+    function handleClearAll() {
+      if (!horses.length) return;
+      const ok = confirm('Clear all horses from your EquiSync stable?');
+      if (!ok) return;
+
+      horses = [];
+      saveStable();
+      renderStable();
+    }
+
+    // This is what the extension calls via injected script
+    function mergeExtensionHorses(fromExt) {
+      if (!Array.isArray(fromExt) || !fromExt.length) return;
+
+      const byId = new Map(horses.map((h) => [h.id, h]));
+
+      fromExt.forEach((h) => {
+        if (!h || !h.id) return;
+        if (byId.has(h.id)) return;
+        horses.push(h);
+        byId.set(h.id, h);
+      });
+
+      saveStable();
+      renderStable();
+    }
+
+    // Expose to window so the injected script can call it
+    window.mergeExtensionHorses = mergeExtensionHorses;
+
     if (addBtn) {
       addBtn.addEventListener('click', handleAdd);
     }
-
-    if (clearAllBtn) {
-      clearAllBtn.addEventListener('click', () => {
-        if (!horses.length) return;
-
-        const ok = confirm(
-          'Clear all horses from your EquiSync stable? This cannot be undone.'
-        );
-        if (!ok) return;
-
-        horses = [];
-        saveStable();
-        renderStable();
-      });
+    if (clearBtn) {
+      clearBtn.addEventListener('click', handleClearAll);
     }
 
-    // ✅ Order matters: load → import from query → render
+    // Initialise
     loadStable();
-    importHorseFromQuery();
     renderStable();
   })();
 </script>
