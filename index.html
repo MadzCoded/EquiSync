@@ -650,49 +650,99 @@
       }
     }
 
-    function renderStats() {
-      if (!statsTable || !statsEmpty) return;
+function renderStats() {
+  if (!statsTable || !statsEmpty) return;
 
-      const tbody = statsTable.querySelector('tbody');
-      tbody.innerHTML = '';
+  const tbody = statsTable.querySelector('tbody');
+  tbody.innerHTML = '';
 
-      if (!horses.length) {
-        statsEmpty.style.display = 'block';
-        statsTable.style.display = 'none';
-        return;
+  if (!horses.length) {
+    statsEmpty.style.display = 'block';
+    statsTable.style.display = 'none';
+    return;
+  }
+
+  statsEmpty.style.display = 'none';
+  statsTable.style.display = 'table';
+
+  horses.forEach((horse) => {
+    const tr = document.createElement('tr');
+
+    // Horse name
+    const nameTd = document.createElement('td');
+    nameTd.textContent = horse.name || `Horse #${horse.id}`;
+
+    // Sex
+    const sexTd = document.createElement('td');
+    sexTd.textContent = horse.sex || '—';
+
+    // Breed
+    const breedTd = document.createElement('td');
+    breedTd.textContent = horse.breed || '—';
+
+    // Birthday
+    const bdayTd = document.createElement('td');
+    bdayTd.textContent = horse.birthday || '—';
+
+    // Owner
+    const ownerTd = document.createElement('td');
+    if (horse.ownerName) {
+      if (horse.ownerUrl) {
+        const a = document.createElement('a');
+        a.href = horse.ownerUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = horse.ownerName;
+        ownerTd.appendChild(a);
+      } else {
+        ownerTd.textContent = horse.ownerName;
       }
-
-      statsEmpty.style.display = 'none';
-      statsTable.style.display = 'table';
-
-      horses.forEach((horse) => {
-        const tr = document.createElement('tr');
-
-        const nameTd = document.createElement('td');
-        nameTd.textContent = horse.name || `Horse #${horse.id}`;
-
-        const sexTd = document.createElement('td');
-        sexTd.textContent = horse.sex || '—';
-
-        const idTd = document.createElement('td');
-        idTd.textContent = horse.id || '—';
-
-        const linkTd = document.createElement('td');
-        const link = document.createElement('a');
-        link.href = horse.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'Open';
-        linkTd.appendChild(link);
-
-        tr.appendChild(nameTd);
-        tr.appendChild(sexTd);
-        tr.appendChild(idTd);
-        tr.appendChild(linkTd);
-
-        tbody.appendChild(tr);
-      });
+    } else {
+      ownerTd.textContent = '—';
     }
+
+    // Breeder
+    const breederTd = document.createElement('td');
+    if (horse.breederName) {
+      if (horse.breederUrl) {
+        const a = document.createElement('a');
+        a.href = horse.breederUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = horse.breederName;
+        breederTd.appendChild(a);
+      } else {
+        breederTd.textContent = horse.breederName;
+      }
+    } else {
+      breederTd.textContent = '—';
+    }
+
+    // Location
+    const locTd = document.createElement('td');
+    locTd.textContent = horse.location || '—';
+
+    // Link
+    const linkTd = document.createElement('td');
+    const link = document.createElement('a');
+    link.href = horse.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Open';
+    linkTd.appendChild(link);
+
+    tr.appendChild(nameTd);
+    tr.appendChild(sexTd);
+    tr.appendChild(breedTd);
+    tr.appendChild(bdayTd);
+    tr.appendChild(ownerTd);
+    tr.appendChild(breederTd);
+    tr.appendChild(locTd);
+    tr.appendChild(linkTd);
+
+    tbody.appendChild(tr);
+  });
+}
 
     function renderStable() {
       if (!listEl || !emptyMsg) return;
