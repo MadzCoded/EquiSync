@@ -526,16 +526,26 @@
         const main = document.createElement('div');
         main.className = 'stable-item-main';
 
+        // Line 1: name + ID
         const idLine = document.createElement('div');
         idLine.className = 'stable-item-id';
         idLine.textContent = horse.name
           ? `${horse.name} (#${horse.id})`
           : `Horse #${horse.id}`;
-
         main.appendChild(idLine);
 
+        // Line 2: sex (if we know it)
+        if (horse.sex) {
+          const metaLine = document.createElement('div');
+          metaLine.className = 'stable-item-url'; // reuse muted style
+          metaLine.textContent = horse.sex;       // e.g. "Mare", "Stallion", "Gelding"
+          main.appendChild(metaLine);
+        }
+
         const actions = document.createElement('div');
-        actions.className = 'stable-actions';
+        actions.style.display = 'flex';
+        actions.style.gap = '0.5rem';
+        actions.style.alignItems = 'center';
 
         const link = document.createElement('a');
         link.href = horse.url;
@@ -545,7 +555,13 @@
 
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
-        removeBtn.className = 'stable-delete';
+        removeBtn.style.border = '1px solid rgba(248, 113, 113, 0.5)';
+        removeBtn.style.borderRadius = '999px';
+        removeBtn.style.padding = '0.25rem 0.7rem';
+        removeBtn.style.background = 'rgba(15, 23, 42, 0.9)';
+        removeBtn.style.color = '#fca5a5';
+        removeBtn.style.fontSize = '0.75rem';
+        removeBtn.style.cursor = 'pointer';
 
         removeBtn.addEventListener('click', () => {
           horses = horses.filter(h => h.id !== horse.id);
