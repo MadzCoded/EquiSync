@@ -37,7 +37,7 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-  // 🔹 When the EquiSync button is clicked
+  // When the EquiSync button is clicked
   btn.addEventListener("click", () => {
     // 1) Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
@@ -48,17 +48,28 @@ function insertEquiSyncButton() {
     const lifeNumber = match[1];
 
     // 2) Extract horse name from the PAGE TITLE
-    // Realtools does: d.title.replace(/ - Horse Reality$/, '')
+    // RealTools-style: d.title.replace(/ - Horse Reality$/, '')
     let horseName = "Unknown";
     const title = document.title || "";
 
     if (title) {
-      // Remove the " - Horse Reality" suffix or anything after " - "
+      // Try to strip " - Horse Reality" at the end
       horseName = title.replace(/\s*-\s*Horse Reality\s*$/i, "").trim();
-      // As a fallback, if that didn't change anything, just strip anything after first " - "
+
+      // If that didn't actually change anything, fall back to taking text before first " - "
       if (!horseName || horseName === title) {
         horseName = title.split(" - ")[0].trim();
       }
+
+      // If still empty for some reason, fall back to the full title
+      if (!horseName) {
+        horseName = title.trim();
+      }
+    }
+
+    // As a final fallback, if everything failed, at least label by ID
+    if (!horseName) {
+      horseName = `Horse #${lifeNumber}`;
     }
 
     // 3) Build your EquiSync URL with id + name
@@ -66,7 +77,7 @@ function insertEquiSyncButton() {
       "https://madzcoded.github.io/EquiSync/?id=" +
       encodeURIComponent(lifeNumber) +
       "&name=" +
-      encodeURIComponent(horseName || "Unknown");
+      encodeURIComponent(horseName);
 
     // 4) Open EquiSync in a new tab
     window.open(equiSyncUrl, "_blank");
