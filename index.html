@@ -400,6 +400,88 @@
   color: #fecaca;
   background: rgba(15, 23, 42, 0.85);
 }
+
+    /* ---------- Tabs ---------- */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      padding-bottom: 0.4rem;
+    }
+
+    .tab-button {
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .tab-button:hover {
+      color: var(--text-main);
+      border-color: rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .tab-button.active {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(249, 115, 22, 0.8);
+      color: var(--text-main);
+    }
+
+    .view-hidden {
+      display: none;
+    }
+
+    /* ---------- Stats view ---------- */
+    .stats-view {
+      margin-top: 1.2rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+      padding-top: 1rem;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+    }
+
+    .stats-table th,
+    .stats-table td {
+      padding: 0.45rem 0.4rem;
+      text-align: left;
+    }
+
+    .stats-table th {
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .stats-table tbody tr:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .stats-table tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .stats-table td:last-child {
+      text-align: right;
+    }
+
+    .stats-empty {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -428,35 +510,83 @@
           </p>
         </header>
 
-        <!-- URL paste box goes here -->
-<div class="url-input-wrapper">
-  <label for="horse-url">Paste Horse URL</label>
-  <input
-    type="url"
-    id="horse-url"
-    class="url-box"
-    placeholder="https://www.horsereality.com/horses/123456..."
-  />
+        <!-- Tabs -->
+        <div class="tabs">
+          <button
+            type="button"
+            class="tab-button active"
+            id="tab-stable"
+          >
+            Stable
+          </button>
+          <button
+            type="button"
+            class="tab-button"
+            id="tab-stats"
+          >
+            Stats
+          </button>
+        </div>
 
-  <button class="add-horse-btn" id="add-horse-btn">
-    Add Horse
-  </button>
+        <!-- STABLE VIEW (default tab) -->
+        <div id="stable-view">
+          <div class="url-input-wrapper">
+            <label for="horse-url">Paste Horse URL</label>
+            <input
+              type="url"
+              id="horse-url"
+              class="url-box"
+              placeholder="https://www.horsereality.com/horses/123456..."
+            />
+
+            <button class="add-horse-btn" id="add-horse-btn">
+              Add Horse
+            </button>
+          </div>
+
+          <section class="stable-list" id="stable-list">
+            <div class="stable-list-header">
+              <h2>Your Stable</h2>
+              <button
+                class="clear-all-btn"
+                id="clear-all-btn"
+                type="button"
+              >
+                Clear all
+              </button>
+            </div>
+            <p class="stable-empty" id="stable-empty">No horses added yet.</p>
+            <ul class="stable-items" id="stable-items"></ul>
+          </section>
+        </div>
+
+        <!-- STATS VIEW (second tab) -->
+        <section
+          class="stats-view view-hidden"
+          id="stats-view"
+        >
+          <div class="stable-list-header">
+  <h2>Stats overview</h2>
 </div>
 
-<section class="stable-list" id="stable-list">
-  <div class="stable-list-header">
-    <h2>Your Stable</h2>
-    <button
-      class="clear-all-btn"
-      id="clear-all-btn"
-      type="button"
-    >
-      Clear all
-    </button>
-  </div>
-  <p class="stable-empty" id="stable-empty">No horses added yet.</p>
-  <ul class="stable-items" id="stable-items"></ul>
-</section>
+          <p class="stats-empty" id="stats-empty">
+            No horses to show yet. Add some in the Stable tab.
+          </p>
+
+          <table class="stats-table" id="stats-table">
+            <thead>
+              <tr>
+                <th>Horse</th>
+                <th>Sex</th>
+                <th>ID</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Filled by JS -->
+            </tbody>
+          </table>
+        </section>
 
         <footer class="footer">
           <div class="author">
@@ -483,6 +613,14 @@
     const listEl = document.getElementById('stable-items');
     const clearBtn = document.getElementById('clear-all-btn');
 
+    // Tabs + views
+    const tabStable = document.getElementById('tab-stable');
+    const tabStats = document.getElementById('tab-stats');
+    const stableView = document.getElementById('stable-view');
+    const statsView = document.getElementById('stats-view');
+    const statsTable = document.getElementById('stats-table');
+    const statsEmpty = document.getElementById('stats-empty');
+
     let horses = [];
 
     const STORAGE_KEY = 'equisyncStable';
@@ -508,16 +646,59 @@
       }
     }
 
+    function renderStats() {
+      if (!statsTable || !statsEmpty) return;
+
+      const tbody = statsTable.querySelector('tbody');
+      tbody.innerHTML = '';
+
+      if (!horses.length) {
+        statsEmpty.style.display = 'block';
+        statsTable.style.display = 'none';
+        return;
+      }
+
+      statsEmpty.style.display = 'none';
+      statsTable.style.display = 'table';
+
+      horses.forEach((horse) => {
+        const tr = document.createElement('tr');
+
+        const nameTd = document.createElement('td');
+        nameTd.textContent = horse.name || `Horse #${horse.id}`;
+
+        const sexTd = document.createElement('td');
+        sexTd.textContent = horse.sex || '—';
+
+        const idTd = document.createElement('td');
+        idTd.textContent = horse.id || '—';
+
+        const linkTd = document.createElement('td');
+        const link = document.createElement('a');
+        link.href = horse.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = 'Open';
+        linkTd.appendChild(link);
+
+        tr.appendChild(nameTd);
+        tr.appendChild(sexTd);
+        tr.appendChild(idTd);
+        tr.appendChild(linkTd);
+
+        tbody.appendChild(tr);
+      });
+    }
+
     function renderStable() {
       if (!listEl || !emptyMsg) return;
       listEl.innerHTML = '';
 
       if (!horses.length) {
         emptyMsg.style.display = 'block';
-        return;
+      } else {
+        emptyMsg.style.display = 'none';
       }
-
-      emptyMsg.style.display = 'none';
 
       horses.forEach((horse) => {
         const li = document.createElement('li');
@@ -576,6 +757,9 @@
         li.appendChild(actions);
         listEl.appendChild(li);
       });
+
+      // Also refresh the stats table whenever stable changes
+      renderStats();
     }
 
     function handleAdd() {
@@ -674,6 +858,30 @@
     }
     if (clearBtn) {
       clearBtn.addEventListener('click', handleClearAll);
+    }
+
+    // ----- Tabs: switch between Stable and Stats -----
+    function showStableView() {
+      if (stableView) stableView.classList.remove('view-hidden');
+      if (statsView) statsView.classList.add('view-hidden');
+
+      if (tabStable) tabStable.classList.add('active');
+      if (tabStats) tabStats.classList.remove('active');
+    }
+
+    function showStatsView() {
+      if (stableView) stableView.classList.add('view-hidden');
+      if (statsView) statsView.classList.remove('view-hidden');
+
+      if (tabStable) tabStable.classList.remove('active');
+      if (tabStats) tabStats.classList.add('active');
+    }
+
+    if (tabStable) {
+      tabStable.addEventListener('click', showStableView);
+    }
+    if (tabStats) {
+      tabStats.addEventListener('click', showStatsView);
     }
 
     // Initialise with whatever is already in localStorage
