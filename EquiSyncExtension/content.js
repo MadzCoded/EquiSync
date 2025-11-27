@@ -36,31 +36,39 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-  btn.addEventListener("click", () => {
-    // Extract lifenumber from URL, e.g. /horses/22238866/
+btn.addEventListener("click", () => {
+    // 1. Extract lifenumber
     const match = window.location.href.match(/horses\/(\d+)/i);
     if (!match) {
-      alert("EquiSync couldn't find this horse's lifenumber in the URL.");
-      return;
+        alert("EquiSync couldn't find this horse's lifenumber in the URL.");
+        return;
     }
-
     const lifeNumber = match[1];
 
-// Extract horse name (bulletproof)
-let horseName = "Unknown";
-const nameEl = document.querySelector("#name");
+    // 2. Extract horse name using RealTools method (window.horse)
+    let horseName = "Unknown";
 
-if (nameEl) {
-  horseName = Array.from(nameEl.childNodes)
-    .filter(n => n.nodeType === Node.TEXT_NODE)
-    .map(n => n.textContent.trim())
-    .join(" ")
-    .trim();
-}
+    if (window.horse && window.horse.name) {
+        horseName = window.horse.name.trim();
+    } else {
+        // fallback if Realtools hasn't loaded
+        const nameEl = document.querySelector("h1#name");
+        if (nameEl) {
+            const textNode = [...nameEl.childNodes].find(n => n.nodeType === Node.TEXT_NODE);
+            if (textNode) horseName = textNode.textContent.trim();
+        }
+    }
 
-    // Open EquiSync in a new tab
+    // 3. Build the redirect URL
+    const equiSyncUrl =
+        "https://madzcoded.github.io/EquiSync/?id=" +
+        encodeURIComponent(lifeNumber) +
+        "&name=" +
+        encodeURIComponent(horseName);
+
+    // 4. Open EquiSync in a new tab
     window.open(equiSyncUrl, "_blank");
-  });
+});
 
   document.body.appendChild(btn);
   return true;
