@@ -109,10 +109,9 @@ function insertEquiSyncButton() {
 
       existing.push(horse);
 
-      chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-        // Tiny confirmation – later you can make this a nicer toast
-        alert(`Added to EquiSync: ${horse.name} (#${horse.id})`);
-      });
+chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
+  // No popup – quiet add
+});
     });
   });
 
