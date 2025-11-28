@@ -4,831 +4,242 @@
   <meta charset="UTF-8" />
   <title>EquiSync – Stable Tracker for Horse Reality</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
     :root {
-      --bg-gradient: radial-gradient(circle at top left, #4f46e5, #111827 55%, #020617);
       --accent: #f97316;
       --accent-soft: rgba(249, 115, 22, 0.15);
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
-      --card-bg: rgba(15, 23, 42, 0.75);
-      --border-subtle: rgba(148, 163, 184, 0.25);
       --blur-radius: 22px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #1e293b, #020617 55%, #000000 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
     }
 
-body {
-  min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Inter", "Segoe UI", sans-serif;
-
-  /* simpler, cleaner gradient background */
-  background:
-    radial-gradient(circle at top left, #1e293b, #020617 55%, #000000 100%);
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-    /* Background overlay for readability */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.2), transparent 50%),
-        radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.18), transparent 55%);
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .noise {
-      position: fixed;
-      inset: 0;
-      opacity: 0.05;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-    }
-
-    .shell {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 720px;
-      margin-inline: auto;
-    }
-
+    .shell { width: 100%; max-width: 920px; margin-inline: auto; }
     .card {
-      border-radius: 1.75rem;
-      border: 1px solid var(--border-subtle);
-      background: linear-gradient(
-        135deg,
-        rgba(15, 23, 42, 0.92),
-        rgba(15, 23, 42, 0.72)
-      );
-      backdrop-filter: blur(var(--blur-radius));
-      box-shadow:
-        0 22px 60px rgba(15, 23, 42, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
-      padding: 2.1rem 2.25rem 2.4rem;
-      position: relative;
-      overflow: hidden;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(148,163,184,0.12);
+      background: linear-gradient(135deg, rgba(7,10,19,0.9), rgba(10,14,24,0.78));
+      padding: 2rem;
+      box-shadow: 0 20px 50px rgba(2,6,23,0.8);
     }
 
-    @media (min-width: 768px) {
-      .card {
-        padding: 2.6rem 2.8rem 2.8rem;
-      }
-    }
-
-    .halo {
-      position: absolute;
-      inset: -1px;
-      background:
-        radial-gradient(circle at 0% 0%, var(--accent-soft), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.1), transparent 55%);
-      mix-blend-mode: screen;
-      opacity: 0.85;
-      pointer-events: none;
-    }
-
-    .card-inner {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 1.8rem;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.25rem 0.8rem;
-      border-radius: 999px;
-      border: 1px solid rgba(249, 115, 22, 0.4);
-      background: rgba(15, 23, 42, 0.85);
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: radial-gradient(circle, var(--accent) 0%, #facc15 40%, transparent 100%);
-      box-shadow: 0 0 12px rgba(248, 250, 252, 0.5);
-    }
-
-    h1 {
-      font-size: clamp(2.35rem, 4vw, 3rem);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      text-wrap: balance;
-    }
-
-    .title-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-
-    .title-main {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 0.6rem;
-    }
-
+    .title-row { margin-bottom: 1rem; }
     .accent-gradient {
-      background: linear-gradient(135deg, #f97316, #facc15);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      background: linear-gradient(135deg,#f97316,#facc15);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-weight: 700;
+      font-size: 2.1rem;
+      letter-spacing: 0.04em;
     }
+    .subtitle { color: var(--text-muted); margin-top: 0.35rem; }
 
-    .subtitle {
-      font-size: 0.98rem;
-      max-width: 32rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      text-wrap: pretty;
-    }
-
-    .footer {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-top: 0.5rem;
-      font-size: 0.83rem;
-      color: var(--text-muted);
-    }
-
-    .author {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .author span {
-      opacity: 0.9;
-    }
-
-    .author a {
-      position: relative;
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 500;
-      padding-bottom: 0.1rem;
-    }
-
-    .author a::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -1px;
-      width: 100%;
-      height: 1px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), #facc15);
-      transform-origin: left;
-      transform: scaleX(0);
-      transition: transform 180ms ease-out;
-      opacity: 0.85;
-    }
-
-    .author a:hover::after {
-      transform: scaleX(1);
-    }
-
-    .author a:hover {
-      color: var(--accent);
-    }
-
-    .badge {
-      padding: 0.18rem 0.65rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.8);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.9);
-    }
-
-    .url-input-wrapper {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.url-input-wrapper label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.url-box {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.65);
-  color: var(--text-main);
-  font-size: 0.95rem;
-  outline: none;
-  transition: 0.2s ease;
-}
-
-.url-box:focus {
-  border-color: var(--accent);
-  background: rgba(15, 23, 42, 0.85);
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
-}
-    
-.stable-list {
-  margin-top: 1.5rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-.stable-list-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 0.6rem;
-}
-
-.stable-list-header h2 {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-}
-
-.stable-empty {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.stable-items {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.4rem;
-}
-
-.stable-item {
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(15, 23, 42, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  font-size: 0.9rem;
-}
-
-.stable-item-main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.stable-item-id {
-  font-weight: 500;
-}
-
-.stable-item-url {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  word-break: break-all;
-}
-
-.stable-item a {
-  font-size: 0.8rem;
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.stable-item a:hover {
-  text-decoration: underline;
-}
-
-.stable-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.stable-delete {
-  font-size: 0.8rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(248, 113, 113, 0.6);
-  background: rgba(15, 23, 42, 0.85);
-  color: #fecaca;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.stable-delete:hover {
-  background: rgba(248, 113, 113, 0.22);
-  border-color: rgb(248, 113, 113);
-  color: #fee2e2;
-}
-
-    .add-horse-btn {
-  margin-top: 0.3rem;
-  padding: 0.8rem 1.2rem;
-  background: linear-gradient(135deg, #f97316, #facc15);
-  border: none;
-  border-radius: 0.75rem;
-  color: #0f172a;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s ease;
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
-}
-
-.add-horse-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 18px rgba(249, 115, 22, 0.6);
-}
-
-.add-horse-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
-}
-
-.clear-all-btn {
-  font-size: 0.78rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: 0.18s ease;
-}
-
-.clear-all-btn:hover {
-  border-color: rgba(248, 113, 113, 0.85);
-  color: #fecaca;
-  background: rgba(15, 23, 42, 0.85);
-}
-
-    /* ---------- Tabs ---------- */
-    .tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-      padding-bottom: 0.4rem;
-    }
-
+    .tabs { display:flex; gap:0.5rem; margin-top: 1rem; margin-bottom: 1rem; }
     .tab-button {
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.18s ease;
+      padding: 0.45rem 0.9rem; border-radius: 999px; background: transparent;
+      color: var(--text-muted); border: 1px solid transparent; cursor: pointer;
     }
-
-    .tab-button:hover {
-      color: var(--text-main);
-      border-color: rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.7);
-    }
-
     .tab-button.active {
-      background: rgba(15, 23, 42, 0.95);
-      border-color: rgba(249, 115, 22, 0.8);
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(249,115,22,0.18);
       color: var(--text-main);
     }
 
-    .view-hidden {
-      display: none;
+    .url-input-wrapper { display:flex; gap:0.6rem; align-items:center; margin-top: 0.6rem; }
+    .url-box {
+      flex:1; padding:0.65rem 0.9rem; border-radius:0.6rem; background: rgba(255,255,255,0.02);
+      border:1px solid rgba(148,163,184,0.08); color:var(--text-main);
+    }
+    .add-horse-btn {
+      padding:0.6rem 1rem; border-radius:0.6rem; background: linear-gradient(135deg,#f97316,#facc15);
+      color:#08101a; border: none; cursor:pointer; font-weight:600;
     }
 
-    /* ---------- Stats view ---------- */
-    .stats-view {
-      margin-top: 1.2rem;
-      border-top: 1px solid rgba(148, 163, 184, 0.2);
-      padding-top: 1rem;
+    .stable-list { margin-top: 1rem; border-top: 1px solid rgba(148,163,184,0.04); padding-top: 1rem; }
+    .stable-items { list-style:none; display:flex; flex-direction:column; gap:0.5rem; margin-top:0.6rem; }
+    .stable-item {
+      display:flex; justify-content:space-between; gap:1rem; padding:0.7rem; border-radius:0.6rem;
+      background: rgba(255,255,255,0.02); border:1px solid rgba(148,163,184,0.04);
     }
+    .stable-item-main { display:flex; flex-direction:column; }
+    .stable-item-id { font-weight:600; }
+    .stable-item-meta { color:var(--text-muted); font-size:0.85rem; margin-top:0.18rem; }
 
-    .stats-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      margin-top: 0.6rem;
-    }
+    .stable-actions { display:flex; gap:0.5rem; align-items:center; }
+    .action-link { color:var(--accent); text-decoration:none; font-size:0.9rem; }
+    .remove-btn { background:transparent; border:1px solid rgba(255,100,100,0.08); color:#ffb3b3; padding:0.3rem 0.6rem; border-radius:999px; cursor:pointer; }
 
-    .stats-table th,
-    .stats-table td {
-      padding: 0.45rem 0.4rem;
-      text-align: left;
-    }
+    .stats-view { margin-top: 1rem; }
+    .stats-table { width:100%; border-collapse:collapse; margin-top:0.6rem; font-size:0.9rem; }
+    .stats-table th, .stats-table td { padding:0.5rem 0.6rem; text-align:left; border-bottom:1px solid rgba(148,163,184,0.03); }
+    .stats-owner-main, .stats-breeder-main { font-weight:600; }
+    .stats-owner-farm, .stats-breeder-farm { color:var(--text-muted); font-size:0.85rem; margin-top:0.18rem; }
 
-    .stats-table th {
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-    }
-
-    .stats-table tbody tr:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.7);
-    }
-
-    .stats-table tbody tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.4);
-    }
-
-    .stats-table td:last-child {
-      text-align: right;
-    }
-
-    .stats-empty {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-    }
-
-        .stats-owner-main,
-    .stats-breeder-main {
-      font-size: 0.85rem;
-      line-height: 1.2;
-    }
-
-    .stats-owner-farm,
-    .stats-breeder-farm {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      line-height: 1.1;
-    }
+    .footer { display:flex; justify-content:space-between; align-items:center; margin-top:1.2rem; color:var(--text-muted); font-size:0.85rem; }
+    @media (max-width:720px){ .stats-table td, .stats-table th { font-size:0.78rem } }
   </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-
   <main class="shell" aria-labelledby="equisync-title">
     <section class="card">
-      <div class="halo" aria-hidden="true"></div>
-
       <div class="card-inner">
-        <div class="pill">
-          <span class="pill-dot"></span>
-          <span>Stable Tracker • Horse Reality</span>
-        </div>
-
         <header class="title-row">
-          <div class="title-main">
-            <h1 id="equisync-title">
-              <span class="accent-gradient">EquiSync</span>
-            </h1>
-          </div>
-
-          <p class="subtitle">
-            A sleek, focused hub for syncing, viewing, and managing your Horse Reality
-            stables—built for clarity today and ready to grow with your future features.
-          </p>
+          <div class="accent-gradient" id="equisync-title">EquiSync</div>
+          <div class="subtitle">A focused hub for syncing, viewing and managing Horse Reality stables.</div>
         </header>
 
         <!-- Tabs -->
         <div class="tabs">
-          <button
-            type="button"
-            class="tab-button active"
-            id="tab-stable"
-          >
-            Stable
-          </button>
-          <button
-            type="button"
-            class="tab-button"
-            id="tab-stats"
-          >
-            Stats
-          </button>
+          <button id="tab-stable" class="tab-button active">Stable</button>
+          <button id="tab-stats" class="tab-button">Stats</button>
         </div>
 
-        <!-- STABLE VIEW (default tab) -->
+        <!-- Stable view -->
         <div id="stable-view">
           <div class="url-input-wrapper">
-            <label for="horse-url">Paste Horse URL</label>
-            <input
-              type="url"
-              id="horse-url"
-              class="url-box"
-              placeholder="https://www.horsereality.com/horses/123456..."
-            />
-
-            <button class="add-horse-btn" id="add-horse-btn">
-              Add Horse
-            </button>
+            <input id="horse-url" class="url-box" type="url" placeholder="https://www.horsereality.com/horses/123456..." />
+            <button id="add-horse-btn" class="add-horse-btn">Add Horse</button>
           </div>
 
-          <section class="stable-list" id="stable-list">
-            <div class="stable-list-header">
-              <h2>Your Stable</h2>
-              <button
-                class="clear-all-btn"
-                id="clear-all-btn"
-                type="button"
-              >
-                Clear all
-              </button>
+          <section class="stable-list">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <h3 style="color:var(--text-muted);font-size:0.95rem">Your Stable</h3>
+              <button id="clear-all-btn" class="tab-button" style="background:transparent;border:1px solid rgba(148,163,184,0.04);">Clear all</button>
             </div>
-            <p class="stable-empty" id="stable-empty">No horses added yet.</p>
-            <ul class="stable-items" id="stable-items"></ul>
+
+            <p id="stable-empty" style="color:var(--text-muted);margin-top:0.6rem">No horses added yet.</p>
+            <ul id="stable-items" class="stable-items"></ul>
           </section>
         </div>
 
-        <!-- STATS VIEW (second tab) -->
-        <section
-          class="stats-view view-hidden"
-          id="stats-view"
-        >
-          <div class="stable-list-header">
-  <h2>Stats overview</h2>
-</div>
+        <!-- Stats view -->
+        <section id="stats-view" class="stats-view" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="color:var(--text-muted);font-size:0.95rem">Stats overview</h3>
+            <div style="color:var(--text-muted);font-size:0.85rem">Total: <span id="stable-count">0</span></div>
+          </div>
 
-          <p class="stats-empty" id="stats-empty">
-            No horses to show yet. Add some in the Stable tab.
-          </p>
+          <p id="stats-empty" style="color:var(--text-muted);margin-top:0.6rem">No horses to show yet. Add some in the Stable tab.</p>
 
-<table class="stats-table" id="stats-table">
-  <thead>
-    <tr>
-<th>Horse</th>
-<th>Sex</th>
-<th>Breed</th>
-<th>Birthday</th>
-<th>Owner</th>
-<th>Breeder</th>
-<th>Location</th>
-<th>Link</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Filled by JS -->
-  </tbody>
-</table>
+          <table id="stats-table" class="stats-table" style="display:none;">
+            <thead>
+              <tr>
+                <th>Horse</th>
+                <th>Sex</th>
+                <th>Breed</th>
+                <th>Birthday</th>
+                <th>Owner</th>
+                <th>Breeder</th>
+                <th>Location</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </section>
 
         <footer class="footer">
-          <div class="author">
-            <span>Crafted by</span>
-            <a href="https://github.com/MadzCoded" target="_blank" rel="noopener noreferrer">
-              MadzCoded
-            </a>
-          </div>
-
-          <div class="badge">
-            <span class="badge-dot"></span>
-            <span>Layout-only preview · No data yet</span>
-          </div>
+          <div>Crafted by <a href="https://github.com/MadzCoded" target="_blank" rel="noopener noreferrer" style="color:var(--text-main);text-decoration:none">MadzCoded</a></div>
+          <div style="color:var(--text-muted)">Private tool · local data</div>
         </footer>
       </div>
     </section>
   </main>
 
-<script>
+  <script>
   (function () {
+    const STORAGE_KEY = 'equisyncStable';
     const urlInput = document.getElementById('horse-url');
     const addBtn = document.getElementById('add-horse-btn');
-    const emptyMsg = document.getElementById('stable-empty');
+    const stableEmpty = document.getElementById('stable-empty');
     const listEl = document.getElementById('stable-items');
     const clearBtn = document.getElementById('clear-all-btn');
 
-    // Tabs + views
     const tabStable = document.getElementById('tab-stable');
     const tabStats = document.getElementById('tab-stats');
     const stableView = document.getElementById('stable-view');
     const statsView = document.getElementById('stats-view');
     const statsTable = document.getElementById('stats-table');
     const statsEmpty = document.getElementById('stats-empty');
+    const stableCount = document.getElementById('stable-count');
 
     let horses = [];
 
-    const STORAGE_KEY = 'equisyncStable';
-
     function saveStable() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(horses));
-      } catch (e) {
-        console.error('Failed to save stable', e);
-      }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(horses)); }
+      catch(e) { console.error('saveStable failed', e); }
     }
 
     function loadStable() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
+        if (!raw) { horses = []; return; }
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          horses = parsed;
-        }
-      } catch (e) {
-        console.error('Failed to load stable', e);
-      }
-    }
-
-    function renderStats() {
-      if (!statsTable || !statsEmpty) return;
-
-      const tbody = statsTable.querySelector('tbody');
-      tbody.innerHTML = '';
-
-      if (!horses.length) {
-        statsEmpty.style.display = 'block';
-        statsTable.style.display = 'none';
-        return;
-      }
-
-      statsEmpty.style.display = 'none';
-      statsTable.style.display = 'table';
-
-      horses.forEach((horse) => {
-        const tr = document.createElement('tr');
-
-        // HORSE
-        const nameTd = document.createElement('td');
-        nameTd.textContent = horse.name || `Horse #${horse.id}`;
-
-        // SEX
-        const sexTd = document.createElement('td');
-        sexTd.textContent = horse.sex || '—';
-
-        // BREED
-        const breedTd = document.createElement('td');
-        breedTd.textContent = horse.breed || '—';
-
-        // BIRTHDAY
-        const birthdayTd = document.createElement('td');
-        birthdayTd.textContent = horse.birthday || '—';
-
-        // OWNER (username + farm)
-        const ownerTd = document.createElement('td');
-        const ownerMain = horse.ownerUser || horse.owner || null;
-        const ownerFarm = horse.ownerFarm || null;
-
-        if (ownerMain) {
-          const main = document.createElement('div');
-          main.className = 'stats-owner-main';
-          main.textContent = ownerMain;
-          ownerTd.appendChild(main);
-
-          if (ownerFarm) {
-            const sub = document.createElement('div');
-            sub.className = 'stats-owner-farm';
-            sub.textContent = ownerFarm;
-            ownerTd.appendChild(sub);
-          }
-        } else {
-          ownerTd.textContent = '—';
-        }
-
-        // BREEDER (username + farm / “Foundation Breeder”)
-        const breederTd = document.createElement('td');
-        const breederMain = horse.breederUser || horse.breeder || null;
-        const breederFarm = horse.breederFarm || null;
-
-        if (breederMain) {
-          const main = document.createElement('div');
-          main.className = 'stats-breeder-main';
-          main.textContent = breederMain;
-          breederTd.appendChild(main);
-
-          if (breederFarm) {
-            const sub = document.createElement('div');
-            sub.className = 'stats-breeder-farm';
-            sub.textContent = breederFarm;
-            breederTd.appendChild(sub);
-          }
-        } else {
-          breederTd.textContent = '—';
-        }
-
-        // LOCATION
-        const locTd = document.createElement('td');
-        locTd.textContent = horse.location || '—';
-
-        // LINK
-        const linkTd = document.createElement('td');
-        const link = document.createElement('a');
-        link.href = horse.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'Open';
-        linkTd.appendChild(link);
-
-        tr.appendChild(nameTd);
-        tr.appendChild(sexTd);
-        tr.appendChild(breedTd);
-        tr.appendChild(birthdayTd);
-        tr.appendChild(ownerTd);
-        tr.appendChild(breederTd);
-        tr.appendChild(locTd);
-        tr.appendChild(linkTd);
-
-        tbody.appendChild(tr);
-      });
+        horses = Array.isArray(parsed) ? parsed : [];
+      } catch(e) { console.error('loadStable failed', e); horses = []; }
     }
 
     function renderStable() {
-      if (!listEl || !emptyMsg) return;
       listEl.innerHTML = '';
-
       if (!horses.length) {
-        emptyMsg.style.display = 'block';
+        stableEmpty.style.display = 'block';
       } else {
-        emptyMsg.style.display = 'none';
+        stableEmpty.style.display = 'none';
       }
 
-      horses.forEach((horse) => {
+      horses.forEach(horse => {
         const li = document.createElement('li');
         li.className = 'stable-item';
 
         const main = document.createElement('div');
         main.className = 'stable-item-main';
 
-        // Line 1: name + ID
         const idLine = document.createElement('div');
         idLine.className = 'stable-item-id';
-        idLine.textContent = horse.name
-          ? `${horse.name} (#${horse.id})`
-          : `Horse #${horse.id}`;
+        idLine.textContent = horse.name ? `${horse.name} (#${horse.id})` : `Horse #${horse.id}`;
         main.appendChild(idLine);
 
-        // Line 2: sex + breed (if we know them)
-        const metaBits = [];
-        if (horse.sex) metaBits.push(horse.sex);
-        if (horse.breed) metaBits.push(horse.breed);
-
-        if (metaBits.length) {
-          const metaLine = document.createElement('div');
-          metaLine.className = 'stable-item-url';
-          metaLine.textContent = metaBits.join(' · ');
-          main.appendChild(metaLine);
-        }
+        const metaLine = document.createElement('div');
+        metaLine.className = 'stable-item-meta';
+        const bits = [];
+        if (horse.sex) bits.push(horse.sex);
+        if (horse.breed) bits.push(horse.breed);
+        if (bits.length) metaLine.textContent = bits.join(' · ');
+        else metaLine.textContent = '';
+        if (metaLine.textContent) main.appendChild(metaLine);
 
         const actions = document.createElement('div');
-        actions.style.display = 'flex';
-        actions.style.gap = '0.5rem';
-        actions.style.alignItems = 'center';
+        actions.className = 'stable-actions';
 
-        const link = document.createElement('a');
-        link.href = horse.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'Open';
+        const openLink = document.createElement('a');
+        openLink.href = horse.url;
+        openLink.target = '_blank';
+        openLink.rel = 'noopener noreferrer';
+        openLink.className = 'action-link';
+        openLink.textContent = 'Open';
 
         const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
         removeBtn.textContent = 'Remove';
-        removeBtn.style.border = '1px solid rgba(248, 113, 113, 0.5)';
-        removeBtn.style.borderRadius = '999px';
-        removeBtn.style.padding = '0.25rem 0.7rem';
-        removeBtn.style.background = 'rgba(15, 23, 42, 0.9)';
-        removeBtn.style.color = '#fca5a5';
-        removeBtn.style.fontSize = '0.75rem';
-        removeBtn.style.cursor = 'pointer';
-
         removeBtn.addEventListener('click', () => {
           horses = horses.filter(h => h.id !== horse.id);
           saveStable();
           renderStable();
+          renderStats();
         });
 
-        actions.appendChild(link);
+        actions.appendChild(openLink);
         actions.appendChild(removeBtn);
 
         li.appendChild(main);
@@ -836,45 +247,104 @@ body {
         listEl.appendChild(li);
       });
 
-      // Also refresh the stats table whenever stable changes
+      stableCount.textContent = horses.length;
       renderStats();
     }
 
+    function renderStats() {
+      const tbody = statsTable.querySelector('tbody');
+      tbody.innerHTML = '';
+      if (!horses.length) {
+        statsEmpty.style.display = 'block';
+        statsTable.style.display = 'none';
+        return;
+      }
+      statsEmpty.style.display = 'none';
+      statsTable.style.display = 'table';
+
+      horses.forEach(horse => {
+        const tr = document.createElement('tr');
+
+        // Horse (name)
+        const nameTd = document.createElement('td');
+        nameTd.textContent = horse.name || `Horse #${horse.id}`;
+
+        // Sex
+        const sexTd = document.createElement('td');
+        sexTd.textContent = horse.sex || '—';
+
+        // Breed
+        const breedTd = document.createElement('td');
+        breedTd.textContent = horse.breed || '—';
+
+        // Birthday
+        const birthdayTd = document.createElement('td');
+        birthdayTd.textContent = horse.birthday || '—';
+
+        // Owner
+        const ownerTd = document.createElement('td');
+        if (horse.ownerUser) {
+          const main = document.createElement('div');
+          main.className = 'stats-owner-main';
+          main.textContent = horse.ownerUser;
+          ownerTd.appendChild(main);
+          if (horse.ownerFarm) {
+            const sub = document.createElement('div');
+            sub.className = 'stats-owner-farm';
+            sub.textContent = horse.ownerFarm;
+            ownerTd.appendChild(sub);
+          }
+        } else {
+          ownerTd.textContent = '—';
+        }
+
+        // Breeder
+        const breederTd = document.createElement('td');
+        if (horse.breederUser) {
+          const main = document.createElement('div');
+          main.className = 'stats-breeder-main';
+          main.textContent = horse.breederUser;
+          breederTd.appendChild(main);
+          if (horse.breederFarm) {
+            const sub = document.createElement('div');
+            sub.className = 'stats-breeder-farm';
+            sub.textContent = horse.breederFarm;
+            breederTd.appendChild(sub);
+          }
+        } else {
+          breederTd.textContent = '—';
+        }
+
+        // Location
+        const locTd = document.createElement('td');
+        locTd.textContent = horse.location || '—';
+
+        // Link
+        const linkTd = document.createElement('td');
+        const a = document.createElement('a');
+        a.href = horse.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = 'Open';
+        linkTd.appendChild(a);
+
+        [nameTd, sexTd, breedTd, birthdayTd, ownerTd, breederTd, locTd, linkTd].forEach(n => tr.appendChild(n));
+        tbody.appendChild(tr);
+      });
+    }
+
     function handleAdd() {
-      const raw = urlInput.value.trim();
-      if (!raw) {
-        alert('Please paste a Horse Reality horse URL first.');
-        return;
-      }
-
+      const raw = (urlInput.value || '').trim();
+      if (!raw) { alert('Please paste a Horse Reality horse URL first.'); return; }
       let url;
-      try {
-        url = new URL(raw);
-      } catch {
-        alert('That does not look like a valid URL.');
-        return;
-      }
-
+      try { url = new URL(raw); } catch { alert('That does not look like a valid URL.'); return; }
       if (!url.hostname.includes('horsereality')) {
-        const proceed = confirm(
-          'This URL is not from horsereality.com. Add it anyway?'
-        );
-        if (!proceed) return;
+        if (!confirm('This URL is not from horsereality.com. Add it anyway?')) return;
       }
-
       const match = url.href.match(/horses\/(\d+)/i);
       const id = match ? match[1] : null;
-
-      if (!id) {
-        alert('Could not find a horse ID in that URL.');
-        return;
-      }
-
-      if (horses.some((h) => h.id === id)) {
-        alert('This horse is already in your stable list.');
-        return;
-      }
-
+      if (!id) { alert('Could not find a horse ID in that URL.'); return; }
+      if (horses.some(h => h.id === id)) { alert('This horse is already in your stable list.'); return; }
       const horse = {
         id,
         name: null,
@@ -889,7 +359,6 @@ body {
         url: url.href,
         addedAt: Date.now()
       };
-
       horses.push(horse);
       saveStable();
       renderStable();
@@ -898,81 +367,92 @@ body {
 
     function handleClearAll() {
       if (!horses.length) return;
-      const ok = confirm('Clear all horses from your EquiSync stable?');
-      if (!ok) return;
-
+      if (!confirm('Clear all horses from your EquiSync stable?')) return;
       horses = [];
       saveStable();
       renderStable();
     }
 
-    // Merge horses coming from the extension
+    // Merge horses coming from extension (from postMessage)
     function mergeExtensionHorses(fromExt) {
       if (!Array.isArray(fromExt) || !fromExt.length) return;
-
-      const byId = new Map(horses.map((h) => [h.id, h]));
-
-      fromExt.forEach((h) => {
+      const byId = new Map(horses.map(h => [h.id, h]));
+      fromExt.forEach(h => {
         if (!h || !h.id) return;
-        if (byId.has(h.id)) return;
+        if (byId.has(h.id)) {
+          // Merge fields into existing record - prefer new non-null values
+          const existing = byId.get(h.id);
+          ['name','sex','breed','birthday','ownerUser','ownerFarm','breederUser','breederFarm','location','url'].forEach(k => {
+            if (!existing[k] && h[k]) existing[k] = h[k];
+          });
+          return;
+        }
         horses.push(h);
         byId.set(h.id, h);
       });
-
       saveStable();
       renderStable();
     }
 
-    // Expose to window (just in case we ever call it directly)
+    // Expose for direct calls
     window.mergeExtensionHorses = mergeExtensionHorses;
 
-    // Listen for postMessage from the extension content script
+    // Listen for extension bridge
     window.addEventListener('message', (event) => {
+      // Only accept messages posted into the page context by the extension content script
       if (event.source !== window) return;
       const data = event.data;
       if (!data || data.source !== 'EquiSyncExtension') return;
       if (data.type !== 'EQUISYNC_HORSES') return;
-
       if (Array.isArray(data.horses)) {
         mergeExtensionHorses(data.horses);
       }
     });
 
-    if (addBtn) {
-      addBtn.addEventListener('click', handleAdd);
-    }
-    if (clearBtn) {
-      clearBtn.addEventListener('click', handleClearAll);
-    }
+    // Wire UI
+    if (addBtn) addBtn.addEventListener('click', handleAdd);
+    if (clearBtn) clearBtn.addEventListener('click', handleClearAll);
 
-    // ----- Tabs: switch between Stable and Stats -----
-    function showStableView() {
-      if (stableView) stableView.classList.remove('view-hidden');
-      if (statsView) statsView.classList.add('view-hidden');
+    tabStable.addEventListener('click', () => {
+      tabStable.classList.add('active'); tabStats.classList.remove('active');
+      stableView.style.display = ''; statsView.style.display = 'none';
+    });
+    tabStats.addEventListener('click', () => {
+      tabStats.classList.add('active'); tabStable.classList.remove('active');
+      stableView.style.display = 'none'; statsView.style.display = '';
+    });
 
-      if (tabStable) tabStable.classList.add('active');
-      if (tabStats) tabStats.classList.remove('active');
-    }
-
-    function showStatsView() {
-      if (stableView) stableView.classList.add('view-hidden');
-      if (statsView) statsView.classList.remove('view-hidden');
-
-      if (tabStable) tabStable.classList.remove('active');
-      if (tabStats) tabStats.classList.add('active');
-    }
-
-    if (tabStable) {
-      tabStable.addEventListener('click', showStableView);
-    }
-    if (tabStats) {
-      tabStats.addEventListener('click', showStatsView);
-    }
-
-    // Initialise with whatever is already in localStorage
+    // initial load
     loadStable();
+
+    // Also import query params (old-school ?id=...&name=...) if present
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const name = params.get('name');
+      if (id) {
+        if (!horses.some(h => h.id === id)) {
+          horses.push({
+            id,
+            name: name || null,
+            sex: null,
+            breed: null,
+            birthday: null,
+            ownerUser: null,
+            ownerFarm: null,
+            breederUser: null,
+            breederFarm: null,
+            location: null,
+            url: `https://horsereality.com/horses/${id}/`,
+            addedAt: Date.now()
+          });
+          saveStable();
+        }
+      }
+    } catch(e) { /* ignore */ }
+
     renderStable();
   })();
-</script>
+  </script>
 </body>
 </html>
