@@ -59,7 +59,6 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-  // ---------- SINGLE, CLEAN CLICK HANDLER ----------
   btn.addEventListener("click", () => {
     // 1) Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
@@ -97,11 +96,13 @@ function insertEquiSyncButton() {
     // 4) Extra info from the Info table + breed
     let breed = null;
     let birthday = null;
-    let owner = null;
-    let breeder = null;
+    let ownerUser = null;
+    let ownerFarm = null;
+    let breederUser = null;
+    let breederFarm = null;
     let location = null;
 
-    // a) Breed: <p id="breed">Kathiawari Horse</p>
+    // a) Breed: <p id="breed">Fjord Horse</p>
     const breedEl = document.querySelector("p#breed");
     if (breedEl && breedEl.textContent.trim()) {
       breed = breedEl.textContent.trim();
@@ -128,15 +129,29 @@ function insertEquiSyncButton() {
 
         case "Owner": {
           const ownerLink = itemEl.querySelector("a");
-          const ownerName = ownerLink ? ownerLink.textContent.trim() : null;
-          owner = ownerName || valueText || null;
+          if (ownerLink) {
+            ownerUser = ownerLink.textContent.trim() || null;
+          }
+          // text looks like "ThistleHoof · Willowmere Stud"
+          const parts = valueText.split("·");
+          if (parts.length > 1) {
+            const farm = parts[1].trim();
+            if (farm) ownerFarm = farm;
+          }
           break;
         }
 
         case "Breeder": {
           const breederLink = itemEl.querySelector("a");
-          const breederName = breederLink ? breederLink.textContent.trim() : null;
-          breeder = breederName || valueText || null;
+          if (breederLink) {
+            breederUser = breederLink.textContent.trim() || null;
+          }
+          // text looks like "Caroll · Foundation Breeder"
+          const parts = valueText.split("·");
+          if (parts.length > 1) {
+            const farm = parts[1].trim();
+            if (farm) breederFarm = farm;
+          }
           break;
         }
 
@@ -152,8 +167,10 @@ function insertEquiSyncButton() {
       sex,
       breed,
       birthday,
-      owner,
-      breeder,
+      ownerUser,
+      ownerFarm,
+      breederUser,
+      breederFarm,
       location,
       url: window.location.href,
       addedAt: Date.now()
@@ -176,7 +193,7 @@ function insertEquiSyncButton() {
         // silent success
       });
     });
-  }); // <-- closes click handler
+  });
 
   document.body.appendChild(btn);
   return true;
