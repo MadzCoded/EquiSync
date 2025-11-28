@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "EquiSync – Horse Reality Helper",
-  "version": "0.3.2",
+  "version": "0.3.1",
   "description": "EquiSync helper for Horse Reality.",
   "permissions": ["storage"],
   "content_scripts": [
@@ -9,7 +9,6 @@
       "matches": [
         "*://horsereality.com/horses/*",
         "*://www.horsereality.com/horses/*",
-        "*://v2.horsereality.com/horses/*",
         "https://madzcoded.github.io/EquiSync/*"
       ],
       "js": ["content.js"],
