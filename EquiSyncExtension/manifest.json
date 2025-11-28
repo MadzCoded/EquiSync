@@ -9,6 +9,7 @@
       "matches": [
         "*://horsereality.com/horses/*",
         "*://www.horsereality.com/horses/*",
+        "*://v2.horsereality.com/horses/*",
         "https://madzcoded.github.io/EquiSync/*"
       ],
       "js": ["content.js"],
