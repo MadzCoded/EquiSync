@@ -3,9 +3,12 @@
 // ---------- Helpers ----------
 
 function onHorseReality() {
+  const host = location.hostname;
   return (
-    location.hostname === "horsereality.com" ||
-    location.hostname === "www.horsereality.com"
+    host === "horsereality.com" ||
+    host === "www.horsereality.com" ||
+    host === "v2.horsereality.com" ||
+    host === "www.v2.horsereality.com"
   );
 }
 
@@ -103,33 +106,66 @@ function insertEquiSyncButton() {
     let location = null;
 
     // --- Breed: try several selectors ---
-    (function findBreed() {
-      const selectors = [
-        '#breed',
-        'p#breed',
-        'p[id="breed"]',
-        '[data-breed]',
-        '.breed', // fallback class if site changes
-      ];
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el && el.textContent && el.textContent.trim()) {
-          breed = el.textContent.trim();
-          return;
+// --- Breed: try several selectors and label-based fallbacks ---
+(function findBreed() {
+  // 1) Direct ID / common selectors (fast path)
+  const directSelectors = ['#breed', 'p#breed', 'span#breed', '.breed', '[data-breed]'];
+  for (const sel of directSelectors) {
+    const el = document.querySelector(sel);
+    if (el && el.textContent && el.textContent.trim()) {
+      breed = el.textContent.trim();
+      // Clean up common prefixes like "Breed:" if present
+      breed = breed.replace(/^Breed[:\s-]*/i, '').trim();
+      return;
+    }
+  }
+
+  // 2) Look for a label containing "breed" then take nearby text (robust for many layouts)
+  const labelCandidates = Array.from(document.querySelectorAll('label, th, strong, .info_label, .label'));
+  for (const lab of labelCandidates) {
+    const txt = (lab.textContent || '').trim().toLowerCase();
+    if (txt.includes('breed')) {
+      // prefer nextElementSibling text
+      let next = lab.nextElementSibling;
+      if (!next) {
+        // maybe the value is in the same parent, find common value nodes
+        next = lab.parentElement && (lab.parentElement.querySelector('.info_item') || lab.parentElement.querySelector('p') || lab.parentElement.querySelector('div'));
+      }
+      if (next && next.textContent && next.textContent.trim()) {
+        breed = next.textContent.trim().replace(/^Breed[:\s-]*/i, '').trim();
+        if (breed) return;
+      }
+
+      // fallback: the label might be inline with text, try the label's parent text minus label text
+      const parentText = (lab.parentElement && lab.parentElement.textContent) ? lab.parentElement.textContent.trim() : '';
+      if (parentText) {
+        const candidate = parentText.replace(new RegExp(lab.textContent.trim(), 'i'), '').trim();
+        if (candidate) {
+          breed = candidate.replace(/^[:\s-]*/,'').replace(/^Breed[:\s-]*/i,'').trim();
+          if (breed) return;
         }
       }
-      // final fallback: look for "Breed" label + next sibling text
-      const labelEls = Array.from(document.querySelectorAll('label, .info_label, th, strong'));
-      for (const lab of labelEls) {
-        if ((lab.textContent || '').trim().toLowerCase().startsWith('breed')) {
-          const next = lab.nextElementSibling || lab.parentElement.querySelector('.info_item') || lab.parentElement.querySelector('p');
-          if (next && next.textContent && next.textContent.trim()) {
-            breed = next.textContent.trim();
-            return;
-          }
-        }
-      }
-    })();
+    }
+  }
+
+  // 3) Last resort: scan for plausible standalone words that look like a breed (heuristic)
+  // Find short paragraphs near the top of the info area
+  const infoArea = document.querySelector('.horse_profile, .info_table, .profile-content, main') || document.body;
+  const pCandidates = Array.from(infoArea.querySelectorAll('p, div'));
+  for (const p of pCandidates) {
+    const t = (p.textContent || '').trim();
+    if (!t) continue;
+    // Skip if it's obviously long or not a simple "Breed name" (heuristic: <=5 words)
+    const words = t.split(/\s+/).filter(Boolean);
+    if (words.length > 0 && words.length <= 6 && /[A-Za-z]/.test(t) && !/owner|breeder|location|birthday|born|sex/i.test(t)) {
+      // If this text looks like a single proper noun phrase, take it
+      breed = t.replace(/^Breed[:\s-]*/i, '').trim();
+      if (breed) return;
+    }
+  }
+
+  // If we still didn't find anything, leave breed null
+})();
 
     // --- Info items: support both table and div variants ---
     (function parseInfoItems() {
