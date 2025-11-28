@@ -680,27 +680,69 @@ body {
       horses.forEach((horse) => {
         const tr = document.createElement('tr');
 
+        // HORSE
         const nameTd = document.createElement('td');
         nameTd.textContent = horse.name || `Horse #${horse.id}`;
 
+        // SEX
         const sexTd = document.createElement('td');
         sexTd.textContent = horse.sex || '—';
 
+        // BREED
         const breedTd = document.createElement('td');
         breedTd.textContent = horse.breed || '—';
 
+        // BIRTHDAY
         const birthdayTd = document.createElement('td');
         birthdayTd.textContent = horse.birthday || '—';
 
+        // OWNER (username + farm)
         const ownerTd = document.createElement('td');
-        ownerTd.textContent = horse.owner || '—';
+        const ownerMain = horse.ownerUser || horse.owner || null;
+        const ownerFarm = horse.ownerFarm || null;
 
+        if (ownerMain) {
+          const main = document.createElement('div');
+          main.className = 'stats-owner-main';
+          main.textContent = ownerMain;
+          ownerTd.appendChild(main);
+
+          if (ownerFarm) {
+            const sub = document.createElement('div');
+            sub.className = 'stats-owner-farm';
+            sub.textContent = ownerFarm;
+            ownerTd.appendChild(sub);
+          }
+        } else {
+          ownerTd.textContent = '—';
+        }
+
+        // BREEDER (username + farm / “Foundation Breeder”)
         const breederTd = document.createElement('td');
-        breederTd.textContent = horse.breeder || '—';
+        const breederMain = horse.breederUser || horse.breeder || null;
+        const breederFarm = horse.breederFarm || null;
 
-        const locationTd = document.createElement('td');
-        locationTd.textContent = horse.location || '—';
+        if (breederMain) {
+          const main = document.createElement('div');
+          main.className = 'stats-breeder-main';
+          main.textContent = breederMain;
+          breederTd.appendChild(main);
 
+          if (breederFarm) {
+            const sub = document.createElement('div');
+            sub.className = 'stats-breeder-farm';
+            sub.textContent = breederFarm;
+            breederTd.appendChild(sub);
+          }
+        } else {
+          breederTd.textContent = '—';
+        }
+
+        // LOCATION
+        const locTd = document.createElement('td');
+        locTd.textContent = horse.location || '—';
+
+        // LINK
         const linkTd = document.createElement('td');
         const link = document.createElement('a');
         link.href = horse.url;
@@ -715,7 +757,7 @@ body {
         tr.appendChild(birthdayTd);
         tr.appendChild(ownerTd);
         tr.appendChild(breederTd);
-        tr.appendChild(locationTd);
+        tr.appendChild(locTd);
         tr.appendChild(linkTd);
 
         tbody.appendChild(tr);
@@ -747,11 +789,15 @@ body {
           : `Horse #${horse.id}`;
         main.appendChild(idLine);
 
-        // Line 2: sex (if we know it)
-        if (horse.sex) {
+        // Line 2: sex + breed (if we know them)
+        const metaBits = [];
+        if (horse.sex) metaBits.push(horse.sex);
+        if (horse.breed) metaBits.push(horse.breed);
+
+        if (metaBits.length) {
           const metaLine = document.createElement('div');
-          metaLine.className = 'stable-item-url'; // reuse muted style
-          metaLine.textContent = horse.sex;       // e.g. "Mare", "Stallion", "Gelding"
+          metaLine.className = 'stable-item-url';
+          metaLine.textContent = metaBits.join(' · ');
           main.appendChild(metaLine);
         }
 
@@ -832,7 +878,14 @@ body {
       const horse = {
         id,
         name: null,
-        sex: null,       // ✅ no sex info when manually added
+        sex: null,
+        breed: null,
+        birthday: null,
+        ownerUser: null,
+        ownerFarm: null,
+        breederUser: null,
+        breederFarm: null,
+        location: null,
         url: url.href,
         addedAt: Date.now()
       };
@@ -919,7 +972,6 @@ body {
     // Initialise with whatever is already in localStorage
     loadStable();
     renderStable();
-    loadStable();
   })();
 </script>
 </body>
