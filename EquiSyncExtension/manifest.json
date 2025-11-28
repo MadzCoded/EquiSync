@@ -6,18 +6,12 @@
   "permissions": ["storage"],
   "content_scripts": [
     {
-"matches": [
-  "*://horsereality.com/horses/*",
-  "*://www.horsereality.com/horses/*",
-  "*://v2.horsereality.com/horses/*",
-  "https://madzcoded.github.io/EquiSync/*"
-]
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    },
-    {
-      "matches": ["https://madzcoded.github.io/EquiSync/*"],
-      "exclude_matches": ["https://madzcoded.github.io/EquiSync/assets/*"],
+      "matches": [
+        "*://horsereality.com/horses/*",
+        "*://www.horsereality.com/horses/*",
+        "*://v2.horsereality.com/horses/*",
+        "https://madzcoded.github.io/EquiSync/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
