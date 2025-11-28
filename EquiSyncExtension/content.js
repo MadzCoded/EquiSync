@@ -93,7 +93,7 @@ function insertEquiSyncButton() {
       sex = sexImg.alt.trim();
     }
 
-    // 4) Extra info from the Info table + breed
+    // 4) Extra info from the page (robustly)
     let breed = null;
     let birthday = null;
     let ownerUser = null;
@@ -102,63 +102,105 @@ function insertEquiSyncButton() {
     let breederFarm = null;
     let location = null;
 
-    // a) Breed: <p id="breed">Fjord Horse</p>
-    const breedEl = document.querySelector("p#breed");
-    if (breedEl && breedEl.textContent.trim()) {
-      breed = breedEl.textContent.trim();
-    }
-
-    // b) Info rows: Birthday, Owner, Breeder, Location, etc.
-    const infoRows = document.querySelectorAll(".info_table_row");
-    infoRows.forEach((row) => {
-      const labelEl = row.querySelector(".info_label");
-      const itemEl = row.querySelector(".info_item");
-      if (!labelEl || !itemEl) return;
-
-      const label = labelEl.textContent.trim();
-      const valueText = itemEl.textContent.trim();
-
-      switch (label) {
-        case "Birthday":
-          birthday = valueText || null;
-          break;
-
-        case "Location":
-          location = valueText || null;
-          break;
-
-        case "Owner": {
-          const ownerLink = itemEl.querySelector("a");
-          if (ownerLink) {
-            ownerUser = ownerLink.textContent.trim() || null;
-          }
-          // text looks like "ThistleHoof · Willowmere Stud"
-          const parts = valueText.split("·");
-          if (parts.length > 1) {
-            const farm = parts[1].trim();
-            if (farm) ownerFarm = farm;
-          }
-          break;
+    // --- Breed: try several selectors ---
+    (function findBreed() {
+      const selectors = [
+        '#breed',
+        'p#breed',
+        'p[id="breed"]',
+        '[data-breed]',
+        '.breed', // fallback class if site changes
+      ];
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el && el.textContent && el.textContent.trim()) {
+          breed = el.textContent.trim();
+          return;
         }
-
-        case "Breeder": {
-          const breederLink = itemEl.querySelector("a");
-          if (breederLink) {
-            breederUser = breederLink.textContent.trim() || null;
-          }
-          // text looks like "Caroll · Foundation Breeder"
-          const parts = valueText.split("·");
-          if (parts.length > 1) {
-            const farm = parts[1].trim();
-            if (farm) breederFarm = farm;
-          }
-          break;
-        }
-
-        default:
-          break;
       }
-    });
+      // final fallback: look for "Breed" label + next sibling text
+      const labelEls = Array.from(document.querySelectorAll('label, .info_label, th, strong'));
+      for (const lab of labelEls) {
+        if ((lab.textContent || '').trim().toLowerCase().startsWith('breed')) {
+          const next = lab.nextElementSibling || lab.parentElement.querySelector('.info_item') || lab.parentElement.querySelector('p');
+          if (next && next.textContent && next.textContent.trim()) {
+            breed = next.textContent.trim();
+            return;
+          }
+        }
+      }
+    })();
+
+    // --- Info items: support both table and div variants ---
+    (function parseInfoItems() {
+      // Prefer structured rows if available
+      const tryRows = document.querySelectorAll('.info_table_row, table tr');
+      if (tryRows && tryRows.length) {
+        tryRows.forEach((row) => {
+          const labelEl = row.querySelector('.info_label') || row.querySelector('th') || row.querySelector('td:first-child');
+          const itemEl = row.querySelector('.info_item') || row.querySelector('td:nth-child(2)');
+          if (!labelEl || !itemEl) return;
+          const label = (labelEl.textContent || '').trim();
+          const valueText = (itemEl.textContent || '').trim();
+
+          if (/birthday|born/i.test(label)) {
+            birthday = valueText || null;
+          } else if (/location/i.test(label)) {
+            location = valueText || null;
+          } else if (/owner/i.test(label)) {
+            const ownerLink = itemEl.querySelector('a');
+            ownerUser = ownerLink ? ownerLink.textContent.trim() : null;
+            // look for " · " separator for farm/stud name
+            const parts = valueText.split('·').map(s=>s.trim()).filter(Boolean);
+            if (parts.length > 1) ownerFarm = parts.slice(1).join(' · ');
+            else ownerFarm = null;
+          } else if (/breeder/i.test(label)) {
+            const breederLink = itemEl.querySelector('a');
+            breederUser = breederLink ? breederLink.textContent.trim() : null;
+            const parts = valueText.split('·').map(s=>s.trim()).filter(Boolean);
+            if (parts.length > 1) breederFarm = parts.slice(1).join(' · ');
+            else breederFarm = null;
+          }
+        });
+      }
+
+      // If none of the structured rows matched, scan .info_item divs (some pages use div layout)
+      if (!birthday && !ownerUser && !breederUser) {
+        const items = document.querySelectorAll('.info_item, .info-item, .info');
+        items.forEach((item) => {
+          const parent = item.parentElement;
+          // look for a label sibling
+          let labelEl = null;
+          if (parent) {
+            labelEl = parent.querySelector('.info_label') || item.previousElementSibling || parent.querySelector('label');
+          }
+          const label = (labelEl && labelEl.textContent) ? labelEl.textContent.trim() : '';
+          const valueText = (item.textContent || '').trim();
+
+          if (/birthday|born/i.test(label) && !birthday) {
+            birthday = valueText || null;
+          } else if (/location/i.test(label) && !location) {
+            location = valueText || null;
+          } else if (/owner/i.test(label) && !ownerUser) {
+            const ownerLink = item.querySelector('a');
+            ownerUser = ownerLink ? ownerLink.textContent.trim() : null;
+            const parts = valueText.split('·').map(s=>s.trim()).filter(Boolean);
+            if (parts.length > 1) ownerFarm = parts.slice(1).join(' · ');
+          } else if (/breeder/i.test(label) && !breederUser) {
+            const breederLink = item.querySelector('a');
+            breederUser = breederLink ? breederLink.textContent.trim() : null;
+            const parts = valueText.split('·').map(s=>s.trim()).filter(Boolean);
+            if (parts.length > 1) breederFarm = parts.slice(1).join(' · ');
+          }
+        });
+      }
+
+      // Normalize breederFarm if it contains the word "Breeder" (turn "Foundation Breeder" -> "Foundation")
+      if (breederFarm) {
+        breederFarm = breederFarm.replace(/\bBreeder\b/i, '').trim();
+        if (!breederFarm) breederFarm = null;
+      }
+    })();
 
     // 5) Build the horse object with all fields
     const horse = {
