@@ -18,39 +18,6 @@ function onEquiSyncSite() {
 
 const STORAGE_KEY = "equisyncStable";
 
-/**
- * Try to find a value in the info tables at the bottom of the horse page.
- * Looks for a table row where the first cell's text matches `label`
- * (case-insensitive, ":" optional), then returns the second cell's text.
- *
- * Example rows on HR:
- *   Name      AlleyCat Dunner
- *   Born      2017-01-01
- *   Bred by   Someone
- *   Owned by  Someone Else
- *   Location  Some City
- */
-function getInfoValue(label) {
-  const wanted = label.toLowerCase();
-
-  const rows = document.querySelectorAll("table tr");
-  for (const row of rows) {
-    const cells = row.children;
-    if (!cells || cells.length < 2) continue;
-
-    const keyText = (cells[0].textContent || "")
-      .trim()
-      .replace(/:$/, "")
-      .toLowerCase();
-
-    if (keyText === wanted) {
-      const value = (cells[1].textContent || "").trim();
-      return value || null;
-    }
-  }
-  return null;
-}
-
 // ---------- HORSE REALITY MODE ----------
 
 function insertEquiSyncButton() {
@@ -92,33 +59,7 @@ function insertEquiSyncButton() {
     btn.style.boxShadow = "0 8px 20px rgba(0,0,0,0.4)";
   });
 
-  btn.addEventListener("click", () => {
-    // 1) Extract lifenumber from URL, e.g. /horses/22238866/
-    const match = window.location.href.match(/horses\/(\d+)/i);
-    if (!match) {
-      alert("EquiSync couldn't find this horse's lifenumber in the URL.");
-      return;
-    }
-    const lifeNumber = match[1];
-
-    // 2) Extract horse name from the page title
-    let horseName = "Unknown";
-    const title = document.title || "";
-
-    if (title) {
-      horseName = title.replace(/\s*-\s*Horse Reality\s*$/i, "").trim();
-      if (!horseName || horseName === title) {
-        horseName = title.split(" - ")[0].trim();
-      }
-      if (!horseName) {
-        horseName = title.trim();
-      }
-    }
-
-    if (!horseName) {
-      horseName = `Horse #${lifeNumber}`;
-    }
-
+  // ---------- SINGLE, CLEAN CLICK HANDLER ----------
   btn.addEventListener("click", () => {
     // 1) Extract lifenumber from URL, e.g. /horses/22238866/
     const match = window.location.href.match(/horses\/(\d+)/i);
@@ -235,7 +176,7 @@ function insertEquiSyncButton() {
         // silent success
       });
     });
-  });
+  }); // <-- closes click handler
 
   document.body.appendChild(btn);
   return true;
