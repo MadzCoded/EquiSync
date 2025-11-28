@@ -2,10 +2,7 @@
 
 // ---------- Helpers ----------
 function onHorseReality() {
-  return (
-    location.hostname === "horsereality.com" ||
-    location.hostname === "www.horsereality.com"
-  );
+  return location.hostname && location.hostname.endsWith("horsereality.com");
 }
 
 function onEquiSyncSite() {
