@@ -1,61 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>EquiSync Webtool</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- We will create this file next -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>EquiSync Webtool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <header class="topbar">
-        <h1>EquiSync</h1>
-        <nav class="tabs">
-            <button data-tab="stable" class="active">Stable</button>
-            <button data-tab="info">Info</button>
-            <button data-tab="bookmarks">Bookmarks</button>
-            <button data-tab="planner">Breeding Planner</button>
-            <button data-tab="finance">Finance</button>
-            <button data-tab="alerts">Alerts</button>
-        </nav>
-    </header>
+  <header class="topbar">
+    <h1>EquiSync</h1>
+    <nav class="tabs">
+      <button data-tab="stable" class="active">Stable</button>
+      <button data-tab="info">Info</button>
+      <button data-tab="bookmarks">Bookmarks</button>
+      <button data-tab="planner">Breeding Planner</button>
+      <button data-tab="finance">Finance</button>
+      <button data-tab="alerts">Alerts</button>
+    </nav>
+  </header>
 
-    <main id="tab-content">
-        <!-- This area will change depending on the active tab -->
-        <section id="stable" class="tab active">
-            <h2>Your Stable</h2>
-            <p>No horses added yet.</p>
-            <ul id="stable-list"></ul>
-        </section>
+  <main id="tab-content">
+    <section id="stable" class="tab active">
+      <h2>Your Stable</h2>
+      <p>No horses added yet.</p>
+    </section>
 
-        <section id="info" class="tab">
-            <h2>Horse Info</h2>
-            <p>Select a horse from Stable to view details.</p>
-        </section>
+    <section id="info" class="tab">
+      <h2>Horse Info</h2>
+      <p>Select a horse from Stable to view details.</p>
+    </section>
 
-        <section id="bookmarks" class="tab">
-            <h2>Bookmarks</h2>
-            <p>No bookmarked horses yet.</p>
-        </section>
+    <section id="bookmarks" class="tab">
+      <h2>Bookmarks</h2>
+      <p>No bookmarked horses yet.</p>
+    </section>
 
-        <section id="planner" class="tab">
-            <h2>Breeding Planner</h2>
-            <p>Select a mare and stallion to begin.</p>
-        </section>
+    <section id="planner" class="tab">
+      <h2>Breeding Planner</h2>
+      <p>Select a mare and stallion to begin.</p>
+    </section>
 
-        <section id="finance" class="tab">
-            <h2>Finance Tracker</h2>
-            <p>No transactions recorded yet.</p>
-        </section>
+    <section id="finance" class="tab">
+      <h2>Finance Tracker</h2>
+      <p>No transactions recorded yet.</p>
+    </section>
 
-        <section id="alerts" class="tab">
-            <h2>Alerts</h2>
-            <p>No alerts yet.</p>
-        </section>
-    </main>
+    <section id="alerts" class="tab">
+      <h2>Alerts</h2>
+      <p>No alerts yet.</p>
+    </section>
+  </main>
 
-    <script src="app.js"></script>
+  <!-- IMPORTANT: this must be after the HTML, and the filename must match -->
+  <script src="app.js"></script>
 </body>
 </html>
