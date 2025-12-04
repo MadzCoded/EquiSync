@@ -1,49 +1,49 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0d0d0f;
-    color: #eaeaea;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0d0d0f;
+  color: #eaeaea;
 }
 
 /* Header */
 .topbar {
-    background: #141418;
-    padding: 20px;
-    border-bottom: 1px solid #23232b;
+  background: #141418;
+  padding: 20px;
+  border-bottom: 1px solid #23232b;
 }
 
 .topbar h1 {
-    margin: 0;
-    font-size: 28px;
+  margin: 0;
+  font-size: 28px;
 }
 
 /* Tabs */
 .tabs {
-    margin-top: 12px;
+  margin-top: 12px;
 }
 
 .tabs button {
-    background: #1c1c22;
-    color: #ccc;
-    border: 1px solid #2a2a33;
-    padding: 8px 16px;
-    margin-right: 6px;
-    border-radius: 6px;
-    cursor: pointer;
+  background: #1c1c22;
+  color: #ccc;
+  border: 1px solid #2a2a33;
+  padding: 8px 16px;
+  margin-right: 6px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .tabs button.active {
-    background: #3a3a44;
-    color: #fff;
-    border-color: #ff9d3c;
+  background: #3a3a44;
+  color: #fff;
+  border-color: #ff9d3c;
 }
 
 /* Tab content */
 .tab {
-    display: none;
-    padding: 20px;
+  display: none;
+  padding: 20px;
 }
 
 .tab.active {
-    display: block;
+  display: block;
 }
