@@ -1,31 +1,31 @@
-// Run only after the HTML has fully loaded
+// Wait until the HTML is ready
 document.addEventListener("DOMContentLoaded", () => {
   console.log("EquiSync app.js loaded");
 
-  // 1. Grab all the tab buttons and tab sections
+  // Get all tab buttons and tab sections
   const tabButtons = document.querySelectorAll(".tabs button");
   const tabSections = document.querySelectorAll(".tab");
 
   console.log("Found tab buttons:", tabButtons.length);
   console.log("Found tab sections:", tabSections.length);
 
-  // Safety: if something is wrong with HTML
+  // If we didn't find them, bail out
   if (!tabButtons.length || !tabSections.length) {
     console.warn("No tabs or sections found – check HTML structure.");
     return;
   }
 
-  // 2. For each button, listen for a click
+  // Add click listeners
   tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const targetId = button.dataset.tab; // e.g. "stable", "info"
+      const targetId = button.dataset.tab; // "stable", "info", etc.
       console.log("Tab clicked:", targetId);
 
-      // 3. Remove "active" from all buttons, add to clicked one
+      // Update button active state
       tabButtons.forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
 
-      // 4. Hide all sections, show only the matching one
+      // Show the right section
       tabSections.forEach((section) => {
         if (section.id === targetId) {
           section.classList.add("active");
