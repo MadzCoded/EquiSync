@@ -26,21 +26,69 @@ function getHorseId() {
   return match ? match[1] : null;
 }
 
-// ---- Storage: save horse ID into chrome.storage.local ----
+// ---- Scrape basic horse info from the page ----
+function scrapeHorseBasic() {
+  const id = getHorseId();
+  if (!id) return null;
 
-function saveHorse(id) {
+  let name = null;
+  let sex = null;
+  let breed = null;
+
+  // Name lives in #summary-info #name on the new layout
+  const nameEl = document.querySelector("#summary-info #name");
+  if (nameEl) {
+    // sometimes there is an icon inside; take the first text node if possible
+    const firstNode = nameEl.childNodes[0];
+    if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
+      name = firstNode.textContent.trim();
+    } else {
+      name = nameEl.textContent.trim();
+    }
+  }
+
+  // Sex & breed have dedicated ids in the snippet you showed
+  const sexEl = document.getElementById("sex");
+  if (sexEl) {
+    sex = sexEl.textContent.trim();
+  }
+
+  const breedEl = document.getElementById("breed");
+  if (breedEl) {
+    breed = breedEl.textContent.trim();
+  }
+
+  return {
+    id,
+    name,
+    sex,
+    breed
+  };
+}
+
+// ---- Storage: save horse OBJECT into chrome.storage.local ----
+
+function saveHorse(horse) {
   chrome.storage.local.get([STORAGE_KEY], (data) => {
-    const existing = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
+    let existing = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
 
-    if (existing.includes(id)) {
-      console.log("EquiSync: horse already saved:", id);
+    // migrate any old "string-only" entries into { id } objects
+    existing = existing.map((item) => {
+      if (typeof item === "string") {
+        return { id: item };
+      }
+      return item;
+    });
+
+    if (existing.some((h) => h.id === horse.id)) {
+      console.log("EquiSync: horse already saved:", horse.id);
       return;
     }
 
-    existing.push(id);
+    existing.push(horse);
 
     chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-      console.log("EquiSync: horse saved:", id);
+      console.log("EquiSync: horse saved:", horse);
     });
   });
 }
@@ -72,12 +120,14 @@ function injectButton() {
 
   btn.onclick = () => {
     console.log("EquiSync: button clicked!");
-    const id = getHorseId();
-    if (!id) {
-      console.warn("EquiSync: could not find horse ID in URL.");
+
+    const horse = scrapeHorseBasic();
+    if (!horse) {
+      console.warn("EquiSync: could not scrape horse data.");
       return;
     }
-    saveHorse(id);
+
+    saveHorse(horse);
   };
 
   document.body.appendChild(btn);
