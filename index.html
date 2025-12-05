@@ -11,7 +11,6 @@
     <h1>EquiSync</h1>
     <nav class="tabs">
       <button data-tab="stable" class="active">Stable</button>
-      <button data-tab="manual">Manual</button>
       <button data-tab="info">Info</button>
       <button data-tab="bookmarks">Bookmarks</button>
       <button data-tab="planner">Breeding Planner</button>
@@ -24,67 +23,6 @@
     <section id="stable" class="tab active">
       <h2>Your Stable</h2>
       <p>No horses added yet.</p>
-    </section>
-
-    <section id="manual" class="tab">
-      <h2>Manual Input</h2>
-      <p class="manual-intro">
-        Use this form to manually add or edit a horse in your EquiSync stable.
-      </p>
-
-      <form id="manual-horse-form" class="manual-form">
-        <!-- Group 1: basic identity -->
-        <div class="manual-group">
-          <h3>Basic info</h3>
-          <div class="manual-row">
-            <label for="manual-name">Name</label>
-            <input id="manual-name" type="text" placeholder="AlleyCat Dunner" required>
-          </div>
-          <div class="manual-row">
-            <label for="manual-id">Life number / ID</label>
-            <input id="manual-id" type="text" placeholder="22227400" required>
-          </div>
-          <div class="manual-row">
-            <label for="manual-url">Horse URL (optional)</label>
-            <input id="manual-url" type="url" placeholder="https://www.horsereality.com/horses/22227400/">
-          </div>
-        </div>
-
-        <!-- Group 2: core details -->
-        <div class="manual-group">
-          <h3>Core details</h3>
-          <div class="manual-row">
-            <label for="manual-sex">Sex</label>
-            <input id="manual-sex" type="text" placeholder="Stallion / Mare / Gelding">
-          </div>
-          <div class="manual-row">
-            <label for="manual-breed">Breed</label>
-            <input id="manual-breed" type="text" placeholder="Kathiawari Horse">
-          </div>
-          <div class="manual-row">
-            <label for="manual-owner">Owner</label>
-            <input id="manual-owner" type="text" placeholder="ThistleHoof">
-          </div>
-          <div class="manual-row">
-            <label for="manual-breeder">Breeder</label>
-            <input id="manual-breeder" type="text" placeholder="Foundation Breeder">
-          </div>
-        </div>
-
-        <!-- Group 3: notes -->
-        <div class="manual-group">
-          <h3>Notes</h3>
-          <div class="manual-row">
-            <label for="manual-notes">Private notes</label>
-            <textarea id="manual-notes" rows="3" placeholder="Anything you want to remember about this horse..."></textarea>
-          </div>
-        </div>
-
-        <div class="manual-actions">
-          <button type="submit">Save horse</button>
-          <!-- later we can add: Clear form / Delete horse / Load existing horse -->
-        </div>
-      </form>
     </section>
 
     <section id="info" class="tab">
@@ -112,6 +50,8 @@
       <p>No alerts yet.</p>
     </section>
   </main>
+
+  <!-- IMPORTANT: this must be after the HTML, and the filename must match -->
   <script src="app.js"></script>
 </body>
 </html>
