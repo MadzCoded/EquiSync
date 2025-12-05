@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("EquiSync app.js loaded");
 
-  // Get all tab buttons and tab sections
+  // ---------- TAB LOGIC ----------
   const tabButtons = document.querySelectorAll(".tabs button");
   const tabSections = document.querySelectorAll(".tab");
 
@@ -32,18 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           section.classList.remove("active");
         }
-
-                // ---------- EXTENSION MESSAGE LISTENER ----------
-        window.addEventListener("message", (event) => {
-        // Ensure message comes from your extension
-        if (!event.data || event.data.source !== "EquiSyncExtension") return;
-
-        console.log("Received horses from extension:", event.data.horses);
-
-        // For now, just log them.
-        // Later: store in stable array + render horses into Stable tab.
-        });
       });
     });
+  });
+
+  // ---------- EXTENSION MESSAGE LISTENER ----------
+  // This runs on your EquiSync page when the extension calls window.postMessage(...)
+  window.addEventListener("message", (event) => {
+    // Basic safety check
+    if (!event.data || event.data.source !== "EquiSyncExtension") return;
+
+    console.log("EquiSync webtool received horses from extension:", event.data.horses);
+
+    // Right now: just log the IDs.
+    // Later: we'll turn these into horse entries in the Stable tab.
   });
 });
