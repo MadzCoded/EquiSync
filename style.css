@@ -48,3 +48,30 @@ body {
   display: block;
 }
 
+/* Stable list */
+.stable-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0 0;
+}
+
+.stable-item {
+  background: #14141a;
+  border: 1px solid #242430;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stable-item span {
+  color: #eaeaea;
+}
+
+.stable-item small {
+  color: #a0a0b5;
+  font-size: 12px;
+}
