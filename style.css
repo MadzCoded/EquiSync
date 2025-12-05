@@ -1,3 +1,4 @@
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -46,4 +47,74 @@ body {
 
 .tab.active {
   display: block;
+}
+
+/* Manual tab intro text */
+.manual-intro {
+  font-size: 14px;
+  color: #c0c0d0;
+  margin-bottom: 12px;
+}
+
+/* Manual form layout */
+.manual-form {
+  background: #14141a;
+  border: 1px solid #242430;
+  border-radius: 10px;
+  padding: 16px;
+  max-width: 600px;
+}
+
+.manual-group + .manual-group {
+  margin-top: 16px;
+}
+
+.manual-group h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #f0f0ff;
+}
+
+.manual-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.manual-row label {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #d0d0e0;
+}
+
+.manual-row input,
+.manual-row textarea {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #2c2c38;
+  background: #0f0f15;
+  color: #eaeaea;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.manual-row input::placeholder,
+.manual-row textarea::placeholder {
+  color: #77778a;
+}
+
+.manual-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.manual-actions button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #ff9d3c;
+  background: #3a3a44;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
 }
