@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "EquiSync Extension",
+  "version": "1.0",
+  "description": "Collects horse info from HorseReality and sends it to the EquiSync webtool.",
+  
+  "permissions": ["storage"],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.horsereality.com/horses/*",
+        "https://madzcoded.github.io/EquiSync/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}
