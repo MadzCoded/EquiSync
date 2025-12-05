@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("EquiSync app.js loaded");
 
-  // ---------- TAB LOGIC ----------
+  // Get all tab buttons and tab sections
   const tabButtons = document.querySelectorAll(".tabs button");
   const tabSections = document.querySelectorAll(".tab");
 
@@ -15,17 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Add click listeners for each tab button
+  // Add click listeners
   tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const targetId = button.dataset.tab; // "stable", "manual", etc.
+      const targetId = button.dataset.tab; // "stable", "info", etc.
       console.log("Tab clicked:", targetId);
 
-      // Update which button looks active
+      // Update button active state
       tabButtons.forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
 
-      // Show the right tab section, hide the others
+      // Show the right section
       tabSections.forEach((section) => {
         if (section.id === targetId) {
           section.classList.add("active");
@@ -35,38 +35,4 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
-
-  // ---------- MANUAL FORM LOGIC ----------
-  const manualForm = document.getElementById("manual-horse-form");
-  console.log("manualForm element found?", !!manualForm);
-
-  if (manualForm) {
-    manualForm.addEventListener("submit", (event) => {
-      // Stop the browser from reloading the page
-      event.preventDefault();
-      console.log("Manual form submitted.");
-
-      // Read all the fields from the form
-      const name = document.getElementById("manual-name").value.trim();
-      const id = document.getElementById("manual-id").value.trim();
-      const url = document.getElementById("manual-url").value.trim();
-      const sex = document.getElementById("manual-sex").value.trim();
-      const breed = document.getElementById("manual-breed").value.trim();
-      const owner = document.getElementById("manual-owner").value.trim();
-      const breeder = document.getElementById("manual-breeder").value.trim();
-      const notes = document.getElementById("manual-notes").value.trim();
-
-      // For now, just log it so we can see it's working
-      console.log("Collected horse data:", {
-        name,
-        id,
-        url,
-        sex,
-        breed,
-        owner,
-        breeder,
-        notes,
-      });
-    });
-  }
 });
