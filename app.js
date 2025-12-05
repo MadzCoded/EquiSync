@@ -1,92 +1,55 @@
-// Wait until the HTML is ready
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("EquiSync app.js loaded");
+// ---------- SIMPLE HORSE DATA (objects now) ----------
+let horses = []; // e.g. [{ id: "22227400", name: "AlleyCat Dunner", sex: "Stallion", breed: "Kathiawari Horse" }]
 
-  // ---------- TAB LOGIC ----------
-  const tabButtons = document.querySelectorAll(".tabs button");
-  const tabSections = document.querySelectorAll(".tab");
+function renderStable() {
+  console.log("renderStable called. horses =", horses);
 
-  console.log("Found tab buttons:", tabButtons.length);
-  console.log("Found tab sections:", tabSections.length);
+  const listEl = document.getElementById("stable-list");
+  const emptyEl = document.getElementById("stable-empty");
 
-  if (!tabButtons.length || !tabSections.length) {
-    console.warn("No tabs or sections found – check HTML structure.");
+  if (!listEl || !emptyEl) {
+    console.warn("Stable elements not found in DOM.");
     return;
   }
 
-  tabButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetId = button.dataset.tab; // "stable", "info", etc.
-      console.log("Tab clicked:", targetId);
+  listEl.innerHTML = "";
 
-      tabButtons.forEach((btn) => btn.classList.remove("active"));
-      button.classList.add("active");
-
-      tabSections.forEach((section) => {
-        if (section.id === targetId) {
-          section.classList.add("active");
-        } else {
-          section.classList.remove("active");
-        }
-      });
-    });
-  });
-
-  // ---------- SIMPLE HORSE DATA (IDs only for now) ----------
-  let horses = []; // e.g. ["22227400", "12345678"]
-
-  function renderStable() {
-    console.log("renderStable called. horses =", horses);
-
-    const listEl = document.getElementById("stable-list");
-    const emptyEl = document.getElementById("stable-empty");
-
-    console.log("stable-list element?", !!listEl, "stable-empty element?", !!emptyEl);
-
-    if (!listEl || !emptyEl) {
-      console.warn("Stable elements not found in DOM.");
-      return;
-    }
-
-    listEl.innerHTML = "";
-
-    if (!horses.length) {
-      console.log("No horses -> showing empty message");
-      emptyEl.style.display = "block";
-      return;
-    }
-
-    console.log("Rendering", horses.length, "horses into Stable tab.");
-    emptyEl.style.display = "none";
-
-    horses.forEach((id) => {
-      const li = document.createElement("li");
-      li.className = "stable-item";
-
-      const main = document.createElement("span");
-      main.textContent = `Horse #${id}`;
-      li.appendChild(main);
-
-      const sub = document.createElement("small");
-      sub.textContent = "(from extension)";
-      li.appendChild(sub);
-
-      listEl.appendChild(li);
-    });
+  if (!horses.length) {
+    emptyEl.style.display = "block";
+    return;
   }
 
-  // initial render (empty)
-  renderStable();
+  emptyEl.style.display = "none";
 
-  // ---------- EXTENSION MESSAGE LISTENER ----------
-  window.addEventListener("message", (event) => {
-    if (!event.data || event.data.source !== "EquiSyncExtension") return;
+  horses.forEach((item) => {
+    // support old string-only entries as fallback
+    const isString = typeof item === "string";
+    const id = isString ? item : item.id;
+    const name = isString ? null : item.name;
+    const sex = isString ? null : item.sex;
+    const breed = isString ? null : item.breed;
 
-    console.log("EquiSync webtool received horses from extension:", event.data.horses);
+    const li = document.createElement("li");
+    li.className = "stable-item";
 
-    if (Array.isArray(event.data.horses)) {
-      horses = event.data.horses.slice(); // copy array
-      renderStable();
+    // Main line: name + ID
+    const main = document.createElement("span");
+    if (name) {
+      main.textContent = `${name} (#${id})`;
+    } else {
+      main.textContent = `Horse #${id}`;
     }
+    li.appendChild(main);
+
+    // Sub line: sex · breed or generic text
+    const sub = document.createElement("small");
+    const meta = [];
+    if (sex) meta.push(sex);
+    if (breed) meta.push(breed);
+
+    sub.textContent = meta.length ? meta.join(" · ") : "(from extension)";
+    li.appendChild(sub);
+
+    listEl.appendChild(li);
   });
-});
+}
