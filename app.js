@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("EquiSync app.js loaded");
 
-  // Get all tab buttons and tab sections
+  // ---------- TAB LOGIC ----------
   const tabButtons = document.querySelectorAll(".tabs button");
   const tabSections = document.querySelectorAll(".tab");
 
@@ -35,4 +35,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
+
+  // ---------- STABLE FORM LOGIC (just logging for now) ----------
+  const stableForm = document.getElementById("stable-horse-form");
+  console.log("stableForm element found?", !!stableForm);
+
+  if (stableForm) {
+    stableForm.addEventListener("submit", (event) => {
+      event.preventDefault(); // stop the page from reloading
+
+      const name = document.getElementById("stable-name").value.trim();
+      const id = document.getElementById("stable-id").value.trim();
+
+      console.log("Stable form submitted. Horse data:", {
+        name,
+        id,
+      });
+
+      // later: we will add this horse to an array and render it
+    });
+  }
 });
