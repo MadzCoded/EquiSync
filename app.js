@@ -36,17 +36,27 @@ document.addEventListener("DOMContentLoaded", () => {
   let horses = []; // e.g. ["22227400", "12345678"]
 
   function renderStable() {
+    console.log("renderStable called. horses =", horses);
+
     const listEl = document.getElementById("stable-list");
     const emptyEl = document.getElementById("stable-empty");
-    if (!listEl || !emptyEl) return;
+
+    console.log("stable-list element?", !!listEl, "stable-empty element?", !!emptyEl);
+
+    if (!listEl || !emptyEl) {
+      console.warn("Stable elements not found in DOM.");
+      return;
+    }
 
     listEl.innerHTML = "";
 
     if (!horses.length) {
+      console.log("No horses -> showing empty message");
       emptyEl.style.display = "block";
       return;
     }
 
+    console.log("Rendering", horses.length, "horses into Stable tab.");
     emptyEl.style.display = "none";
 
     horses.forEach((id) => {
