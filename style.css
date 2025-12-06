@@ -17,35 +17,9 @@ body {
   font-size: 28px;
 }
 
-/* Tabs */
-.tabs {
-  margin-top: 12px;
-}
-
-.tabs button {
-  background: #1c1c22;
-  color: #ccc;
-  border: 1px solid #2a2a33;
-  padding: 8px 16px;
-  margin-right: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.tabs button.active {
-  background: #3a3a44;
-  color: #fff;
-  border-color: #ff9d3c;
-}
-
-/* Tab content */
-.tab {
-  display: none;
+/* Main content */
+#content {
   padding: 20px;
-}
-
-.tab.active {
-  display: block;
 }
 
 /* Stable list */
