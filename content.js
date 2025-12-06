@@ -1,4 +1,4 @@
-// EquiSync minimal content script
+// EquiSync content script
 
 const STORAGE_KEY = "equisyncHorses";
 
@@ -47,7 +47,7 @@ function scrapeHorseBasic() {
     }
   }
 
-  // Sex & breed have dedicated ids in the snippet you showed
+  // Sex & breed have dedicated ids
   const sexEl = document.getElementById("sex");
   if (sexEl) {
     sex = sexEl.textContent.trim();
@@ -66,7 +66,7 @@ function scrapeHorseBasic() {
   };
 }
 
-// ---- Storage: save horse OBJECT into chrome.storage.local ----
+// ---- Storage: save or UPDATE horse OBJECT in chrome.storage.local ----
 
 function saveHorse(horse) {
   chrome.storage.local.get([STORAGE_KEY], (data) => {
@@ -80,15 +80,19 @@ function saveHorse(horse) {
       return item;
     });
 
-    if (existing.some((h) => h.id === horse.id)) {
-      console.log("EquiSync: horse already saved:", horse.id);
-      return;
+    const index = existing.findIndex((h) => h.id === horse.id);
+
+    if (index !== -1) {
+      // Update existing entry (so old ones get name/sex/breed)
+      existing[index] = { ...existing[index], ...horse };
+      console.log("EquiSync: horse updated:", existing[index]);
+    } else {
+      existing.push(horse);
+      console.log("EquiSync: horse saved:", horse);
     }
 
-    existing.push(horse);
-
     chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-      console.log("EquiSync: horse saved:", horse);
+      // finished saving
     });
   });
 }
