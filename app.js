@@ -65,9 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const breed = isString ? null : item.breed;
       const ownerUser = isString ? null : item.ownerUser;
       const ownerFarm = isString ? null : item.ownerFarm;
+      const url = isString
+       ? `https://www.horsereality.com/horses/${id}/`
+       : (item.url || `https://www.horsereality.com/horses/${id}/`);
 
       const li = document.createElement("li");
       li.className = "stable-item";
+
+      const left = document.createElement("div");
+      left.className = "stable-main";
 
       // Main line: name + ID
       const main = document.createElement("span");
@@ -100,7 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       sub.textContent = text;
-      li.appendChild(sub);
+      left.appendChild(sub);
+
+      li.appendChild(left);
+
+      // Right side: link to HR horse page
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Open";
+      link.className = "stable-link";
+
+      li.appendChild(link);
 
       listEl.appendChild(li);
     });
