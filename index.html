@@ -20,14 +20,14 @@
   </header>
 
   <main id="tab-content">
-<section id="stable" class="tab active">
-  <h2>Your Stable</h2>
+    <section id="stable" class="tab active">
+      <h2>Your Stable</h2>
 
-  <p id="stable-empty">No horses added yet.</p>
+      <p id="stable-empty">No horses added yet.</p>
 
-  <!-- List to show horses from the extension -->
-  <ul id="stable-list" class="stable-list"></ul>
-</section>
+      <!-- List that app.js will fill with horses -->
+      <ul id="stable-list" class="stable-list"></ul>
+    </section>
 
     <section id="info" class="tab">
       <h2>Horse Info</h2>
@@ -55,7 +55,7 @@
     </section>
   </main>
 
-  <!-- IMPORTANT: this must be after the HTML, and the filename must match -->
+  <!-- JS for the webtool (NOT the extension) -->
   <script src="app.js"></script>
 </body>
 </html>
