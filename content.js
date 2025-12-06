@@ -111,6 +111,9 @@ const horse = {
         horse.ownerFarm = parts.slice(1).join(" - ");
       }
     });
+
+        // Remember the exact page URL we scraped from
+    horse.url = window.location.href;
   } catch (err) {
     console.error("EquiSync: error while scraping horse:", err);
     // We still return the partial horse object (at least has id and maybe name)
