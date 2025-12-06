@@ -183,12 +183,24 @@ body {
   background: #0c0c11;
   border-radius: 6px;
   border: 1px dashed #31313f;
-  padding: 24px 8px;
+  padding: 8px;
   font-size: 12px;
   text-align: center;
   color: #66667a;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Show images nicely if we set innerHTML to <img> */
+.info-image-placeholder img {
+  max-width: 100%;
+  max-height: 160px;
+  display: block;
+}
+
+/* Info fields */
 .info-fields dl {
   margin: 0;
 }
