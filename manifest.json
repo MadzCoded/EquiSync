@@ -8,19 +8,20 @@
     "storage"
   ],
 
-  "host_permissions": [
-    "https://www.horsereality.com/*",
-    "https://madzcoded.github.io/*"
-  ],
-
-  "content_scripts": [
-    {
-      "matches": [
-        "https://www.horsereality.com/horses/*",
-        "https://madzcoded.github.io/EquiSync/*"
-      ],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    }
-  ]
+"host_permissions": [
+  "https://horsereality.com/*",
+  "https://www.horsereality.com/*",
+  "https://madzcoded.github.io/*"
+],
+"content_scripts": [
+  {
+    "matches": [
+      "https://horsereality.com/horses/*",
+      "https://www.horsereality.com/horses/*",
+      "https://madzcoded.github.io/EquiSync/*"
+    ],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }
+]
 }
