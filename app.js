@@ -1,42 +1,3 @@
-// Wait until the HTML is ready
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("EquiSync app.js loaded");
-
-  // ---------- TAB LOGIC ----------
-  const tabButtons = document.querySelectorAll(".tabs button");
-  const tabSections = document.querySelectorAll(".tab");
-
-  console.log("Found tab buttons:", tabButtons.length);
-  console.log("Found tab sections:", tabSections.length);
-
-  if (!tabButtons.length || !tabSections.length) {
-    console.warn("No tabs or sections found – check HTML structure.");
-    return;
-  }
-
-  tabButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetId = button.dataset.tab; // "stable", "info", etc.
-      console.log("Tab clicked:", targetId);
-
-      tabButtons.forEach((btn) => btn.classList.remove("active"));
-      button.classList.add("active");
-
-      tabSections.forEach((section) => {
-        if (section.id === targetId) {
-          section.classList.add("active");
-        } else {
-          section.classList.remove("active");
-        }
-      });
-    });
-  });
-
-  // ---------- HORSE DATA (objects now) ----------
-  // Example shape:
-  // { id: "22227400", name: "AlleyCat Dunner", sex: "Stallion", breed: "Kathiawari Horse" }
-  let horses = [];
-
   function renderStable() {
     console.log("renderStable called. horses =", horses);
 
@@ -64,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const name = isString ? null : item.name;
       const sex = isString ? null : item.sex;
       const breed = isString ? null : item.breed;
+      const ownerUser = isString ? null : item.ownerUser;
+      const ownerFarm = isString ? null : item.ownerFarm;
 
       const li = document.createElement("li");
       li.className = "stable-item";
@@ -77,34 +40,31 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       li.appendChild(main);
 
-      // Sub line: sex · breed or generic text
+      // Sub line:
+      // 1) Prefer OwnerUser + OwnerFarm
+      // 2) Fallback to Sex · Breed
+      // 3) Fallback to "(from extension)"
       const sub = document.createElement("small");
-      const meta = [];
-      if (sex) meta.push(sex);
-      if (breed) meta.push(breed);
+      let text = "(from extension)";
 
-      sub.textContent = meta.length ? meta.join(" · ") : "(from extension)";
+      if (ownerUser || ownerFarm) {
+        // e.g. "ThistleHoof – Willowmere Stud"
+        const parts = [];
+        if (ownerUser) parts.push(ownerUser);
+        if (ownerFarm) parts.push(ownerFarm);
+        text = parts.join(" – ");
+      } else {
+        const meta = [];
+        if (sex) meta.push(sex);
+        if (breed) meta.push(breed);
+        if (meta.length) {
+          text = meta.join(" · ");
+        }
+      }
+
+      sub.textContent = text;
       li.appendChild(sub);
 
       listEl.appendChild(li);
     });
   }
-
-  // Initial render (empty state)
-  renderStable();
-
-  // ---------- EXTENSION MESSAGE LISTENER ----------
-  window.addEventListener("message", (event) => {
-    if (!event.data || event.data.source !== "EquiSyncExtension") return;
-
-    console.log(
-      "EquiSync webtool received horses from extension:",
-      event.data.horses
-    );
-
-    if (Array.isArray(event.data.horses)) {
-      horses = event.data.horses.slice(); // copy array
-      renderStable();
-    }
-  });
-});
