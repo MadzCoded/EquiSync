@@ -86,10 +86,7 @@ function scrapeHorseBasic() {
 
       if (!labelCell || !valueCell) return;
 
-      const labelText = (labelCell.textContent || "")
-        .trim()
-        .toLowerCase();
-
+      const labelText = (labelCell.textContent || "").trim().toLowerCase();
       if (labelText !== "owner") return;
 
       const fullText = (valueCell.textContent || "").trim();
