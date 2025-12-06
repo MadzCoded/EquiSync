@@ -4,24 +4,23 @@
   "version": "1.0",
   "description": "Collects horse info from Horse Reality and sends it to the EquiSync webtool.",
 
-  "permissions": [
-    "storage"
+  "permissions": ["storage"],
+
+  "host_permissions": [
+    "https://horsereality.com/*",
+    "https://www.horsereality.com/*",
+    "https://madzcoded.github.io/*"
   ],
 
-"host_permissions": [
-  "https://horsereality.com/*",
-  "https://www.horsereality.com/*",
-  "https://madzcoded.github.io/*"
-],
-"content_scripts": [
-  {
-    "matches": [
-      "https://horsereality.com/horses/*",
-      "https://www.horsereality.com/horses/*",
-      "https://madzcoded.github.io/EquiSync/*"
-    ],
-    "js": ["content.js"],
-    "run_at": "document_idle"
-  }
-]
+  "content_scripts": [
+    {
+      "matches": [
+        "https://horsereality.com/horses/*",
+        "https://www.horsereality.com/horses/*",
+        "https://madzcoded.github.io/EquiSync/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
 }
