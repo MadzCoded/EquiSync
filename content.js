@@ -32,15 +32,15 @@ function scrapeHorseBasic() {
   if (!id) return null;
 
   // Start with a minimal object so even if scraping fails, we at least save the ID
-const horse = {
-  id,
-  name: null,
-  sex: null,
-  breed: null,
-  ownerUser: null,
-  ownerFarm: null,
-  url: null
-};
+  const horse = {
+    id,
+    name: null,
+    sex: null,
+    breed: null,
+    ownerUser: null,
+    ownerFarm: null,
+    url: null
+  };
 
   try {
     // ---------- Name ----------
@@ -112,7 +112,7 @@ const horse = {
       }
     });
 
-        // Remember the exact page URL we scraped from
+    // Remember the exact page URL we scraped from
     horse.url = window.location.href;
   } catch (err) {
     console.error("EquiSync: error while scraping horse:", err);
