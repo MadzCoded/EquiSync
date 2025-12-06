@@ -33,7 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ---------- HORSE DATA (objects now) ----------
-  // Example: { id: "22227400", name: "AlleyCat Dunner", sex: "Stallion", breed: "Kathiawari Horse" }
+  // Example shape:
+  // { id: "22227400", name: "AlleyCat Dunner", sex: "Stallion", breed: "Kathiawari Horse" }
   let horses = [];
 
   function renderStable() {
@@ -57,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     emptyEl.style.display = "none";
 
     horses.forEach((item) => {
-      // support old string-only entries as fallback
+      // Support older string-only entries as fallback
       const isString = typeof item === "string";
       const id = isString ? item : item.id;
       const name = isString ? null : item.name;
@@ -89,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // initial render (empty)
+  // Initial render (empty state)
   renderStable();
 
   // ---------- EXTENSION MESSAGE LISTENER ----------
