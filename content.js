@@ -38,7 +38,7 @@ function scrapeHorseBasic() {
   // Name lives in #summary-info #name on the new layout
   const nameEl = document.querySelector("#summary-info #name");
   if (nameEl) {
-    // sometimes there is an icon inside; take the first text node if possible
+    // sometimes there is an icon inside; try to grab just the text
     const firstNode = nameEl.childNodes[0];
     if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
       name = firstNode.textContent.trim();
@@ -67,7 +67,6 @@ function scrapeHorseBasic() {
 }
 
 // ---- Storage: save or UPDATE horse OBJECT in chrome.storage.local ----
-
 function saveHorse(horse) {
   chrome.storage.local.get([STORAGE_KEY], (data) => {
     let existing = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
@@ -92,13 +91,12 @@ function saveHorse(horse) {
     }
 
     chrome.storage.local.set({ [STORAGE_KEY]: existing }, () => {
-      // finished saving
+      // done
     });
   });
 }
 
 // ---- Inject floating button on horse pages ----
-
 function injectButton() {
   if (!onHorsePage()) return;
   if (document.getElementById("equisync-btn")) return;
@@ -138,7 +136,6 @@ function injectButton() {
 }
 
 // ---- Send stored horses into the EquiSync webtool page ----
-
 function sendHorsesToWebtool() {
   if (!onEquiSync()) return;
 
@@ -160,7 +157,6 @@ function sendHorsesToWebtool() {
 }
 
 // ---- Run appropriate logic depending on page ----
-
 if (onHorsePage()) {
   injectButton();
 }
