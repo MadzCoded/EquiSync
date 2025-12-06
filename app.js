@@ -2,39 +2,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("EquiSync app.js loaded");
 
-  // ---------- TAB LOGIC ----------
-  const tabButtons = document.querySelectorAll(".tabs button");
-  const tabSections = document.querySelectorAll(".tab");
-
-  console.log("Found tab buttons:", tabButtons.length);
-  console.log("Found tab sections:", tabSections.length);
-
-  if (!tabButtons.length || !tabSections.length) {
-    console.warn("No tabs or sections found – check HTML structure.");
-    return;
-  }
-
-  tabButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetId = button.dataset.tab; // "stable", "info", etc.
-      console.log("Tab clicked:", targetId);
-
-      tabButtons.forEach((btn) => btn.classList.remove("active"));
-      button.classList.add("active");
-
-      tabSections.forEach((section) => {
-        if (section.id === targetId) {
-          section.classList.add("active");
-        } else {
-          section.classList.remove("active");
-        }
-      });
-    });
-  });
-
   // ---------- STABLE DATA ----------
   // Array of horse objects coming from the extension
-  let horses = []; // { id, name, sex, breed, ownerUser, ownerFarm }
+  let horses = []; // { id, name, sex, breed, ownerUser, ownerFarm, url }
 
   function renderStable() {
     console.log("renderStable called. horses =", horses);
@@ -66,28 +36,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const ownerUser = isString ? null : item.ownerUser;
       const ownerFarm = isString ? null : item.ownerFarm;
       const url = isString
-       ? `https://www.horsereality.com/horses/${id}/`
-       : (item.url || `https://www.horsereality.com/horses/${id}/`);
+        ? `https://www.horsereality.com/horses/${id}/`
+        : (item.url || `https://www.horsereality.com/horses/${id}/`);
 
       const li = document.createElement("li");
       li.className = "stable-item";
 
+      // Left side: name + owner line
       const left = document.createElement("div");
       left.className = "stable-main";
 
-      // Main line: name + ID
       const main = document.createElement("span");
       if (name) {
         main.textContent = `${name} (#${id})`;
       } else {
         main.textContent = `Horse #${id}`;
       }
-      li.appendChild(main);
+      left.appendChild(main);
 
-      // Sub line:
-      // 1) Prefer OwnerUser + OwnerFarm
-      // 2) Fallback to Sex · Breed
-      // 3) Fallback to "(from extension)"
       const sub = document.createElement("small");
       let text = "(from extension)";
 
