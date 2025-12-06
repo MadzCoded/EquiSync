@@ -34,8 +34,11 @@ function scrapeHorseBasic() {
   let name = null;
   let sex = null;
   let breed = null;
+  let ownerUser = null;
+  let ownerFarm = null;
 
-  // 1) Try <h1 id="name">
+  // ---------- Name ----------
+  // Try <h1 id="name">
   const nameEl = document.getElementById("name");
   if (nameEl) {
     const firstNode = nameEl.childNodes[0];
@@ -46,7 +49,7 @@ function scrapeHorseBasic() {
     }
   }
 
-  // 2) Fallback: use the page title, like "Sundown Jack - Horse Reality"
+  // Fallback: page title, like "AlleyCat Dunner - Horse Reality"
   if (!name && document.title) {
     const m = document.title.match(/^(.*?)\s*-\s*Horse Reality/i);
     if (m) {
@@ -56,19 +59,61 @@ function scrapeHorseBasic() {
     }
   }
 
-  // Sex: <p id="sex"> ... Stallion</p>
+  // ---------- Sex & breed ----------
   const sexEl = document.getElementById("sex");
   if (sexEl) {
     sex = sexEl.innerText.trim();
   }
 
-  // Breed: <p id="breed">Kathiawari Horse</p>
   const breedEl = document.getElementById("breed");
   if (breedEl) {
     breed = breedEl.innerText.trim();
   }
 
-  const horse = { id, name, sex, breed };
+  // ---------- Owner + farm ----------
+  // On your screenshot: "Owner" label in the Info table, with link + farm text.
+  // We'll scan rows in the Info table and look for label "Owner".
+  const infoRoot =
+    document.querySelector("#info") || document.querySelector(".info_table");
+
+  if (infoRoot) {
+    const rows =
+      infoRoot.querySelectorAll("tr") ||
+      infoRoot.querySelectorAll(".info_table_row");
+
+    rows.forEach((row) => {
+      const labelCell =
+        row.querySelector(".info_label") || row.querySelector("td:first-child");
+      const valueCell =
+        row.querySelector(".info_item") || row.querySelector("td:nth-child(2)");
+
+      if (!labelCell || !valueCell) return;
+
+      const labelText = (labelCell.textContent || "").trim().toLowerCase();
+      if (labelText !== "owner") return;
+
+      const fullText = (valueCell.textContent || "").trim();
+
+      // Username is usually a link
+      const a = valueCell.querySelector("a");
+      if (a) {
+        ownerUser = a.textContent.trim();
+      } else if (fullText) {
+        // if no link, use whole value as ownerUser
+        ownerUser = fullText;
+      }
+
+      // Farm name: whatever comes after the username, separated by "·" or "-"
+      // Example: "ThistleHoof - Willowmere Stud"
+      const parts = fullText.split(/[\u00b7-]/).map((s) => s.trim()).filter(Boolean);
+      if (parts.length > 1) {
+        // everything after the first piece = farm name
+        ownerFarm = parts.slice(1).join(" - ");
+      }
+    });
+  }
+
+  const horse = { id, name, sex, breed, ownerUser, ownerFarm };
 
   console.log("EquiSync: scraped horse basic:", horse);
   return horse;
@@ -90,7 +135,7 @@ function saveHorse(horse) {
     const index = existing.findIndex((h) => h.id === horse.id);
 
     if (index !== -1) {
-      // Update existing entry (so old ones get name/sex/breed)
+      // Update existing entry (so old ones get new fields)
       existing[index] = { ...existing[index], ...horse };
       console.log("EquiSync: horse updated:", existing[index]);
     } else {
