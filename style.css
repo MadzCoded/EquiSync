@@ -67,11 +67,28 @@ body {
   align-items: center;
 }
 
-.stable-item span {
+/* Left side (name + owner) */
+.stable-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.stable-main span {
   color: #eaeaea;
 }
 
-.stable-item small {
+.stable-main small {
   color: #a0a0b5;
   font-size: 12px;
+}
+
+/* Right side: link to HR page */
+.stable-link {
+  font-size: 13px;
+  color: #ff9d3c;
+  text-decoration: none;
+}
+
+.stable-link:hover {
+  text-decoration: underline;
 }
