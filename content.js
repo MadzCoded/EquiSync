@@ -35,10 +35,10 @@ function scrapeHorseBasic() {
   let sex = null;
   let breed = null;
 
-  // Name lives in #summary-info #name on the new layout
-  const nameEl = document.querySelector("#summary-info #name");
+  // Name: try just #name
+  const nameEl = document.getElementById("name");
   if (nameEl) {
-    // sometimes there is an icon inside; try to grab just the text
+    // sometimes there is an icon inside; try to grab just the first text node
     const firstNode = nameEl.childNodes[0];
     if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
       name = firstNode.textContent.trim();
@@ -47,23 +47,28 @@ function scrapeHorseBasic() {
     }
   }
 
-  // Sex & breed have dedicated ids
+  // Sex: <p id="sex"> ... Stallion</p>
   const sexEl = document.getElementById("sex");
   if (sexEl) {
+    // take the full text, then trim
     sex = sexEl.textContent.trim();
   }
 
+  // Breed: <p id="breed">Kathiawari Horse</p>
   const breedEl = document.getElementById("breed");
   if (breedEl) {
     breed = breedEl.textContent.trim();
   }
 
-  return {
+  const horse = {
     id,
     name,
     sex,
     breed
   };
+
+  console.log("EquiSync: scraped horse basic:", horse);
+  return horse;
 }
 
 // ---- Storage: save or UPDATE horse OBJECT in chrome.storage.local ----
