@@ -9,20 +9,199 @@
 <body>
   <header class="topbar">
     <h1>EquiSync</h1>
+    <nav class="tabs">
+      <button data-tab="stable" class="active">Stable</button>
+      <button data-tab="info">Info</button>
+      <button data-tab="stats">Stats</button>
+      <button data-tab="colour">Colour</button>
+      <button data-tab="pedigree">Pedigree</button>
+      <button data-tab="calculator">Calculator</button>
+    </nav>
   </header>
 
-  <main id="content">
-    <section id="stable">
+  <main id="tab-content">
+    <!-- STABLE TAB -->
+    <section id="stable" class="tab active">
       <h2>Your Stable</h2>
 
       <p id="stable-empty">No horses added yet.</p>
 
-      <!-- List that app.js will fill with horses -->
       <ul id="stable-list" class="stable-list"></ul>
+      <p class="hint">
+        Tip: click a horse in this list, then switch to the Info / Stats / Colour tabs.
+      </p>
+    </section>
+
+    <!-- INFO TAB -->
+    <section id="info" class="tab">
+      <h2>Horse Info</h2>
+      <div id="info-empty" class="tab-empty">
+        Select a horse from the Stable tab to see its info.
+      </div>
+      <div id="info-panel" class="info-panel" hidden>
+        <div class="info-header">
+          <div>
+            <div class="info-name" id="info-name"></div>
+            <div class="info-id" id="info-id"></div>
+          </div>
+          <div class="info-age" id="info-age"></div>
+        </div>
+
+        <div class="info-layout">
+          <div class="info-images">
+            <div class="info-image-block">
+              <div class="info-image-label">Adult</div>
+              <div class="info-image-placeholder" id="info-image-adult">
+                No image set
+              </div>
+            </div>
+            <div class="info-image-block">
+              <div class="info-image-label">Foal</div>
+              <div class="info-image-placeholder" id="info-image-foal">
+                No image set
+              </div>
+            </div>
+          </div>
+
+          <div class="info-fields">
+            <dl>
+              <div>
+                <dt>Sex</dt>
+                <dd id="info-sex">—</dd>
+              </div>
+              <div>
+                <dt>Breed</dt>
+                <dd id="info-breed">—</dd>
+              </div>
+              <div>
+                <dt>Owner</dt>
+                <dd id="info-owner">—</dd>
+              </div>
+              <div>
+                <dt>Breeder</dt>
+                <dd id="info-breeder">—</dd>
+              </div>
+              <div>
+                <dt>Location</dt>
+                <dd id="info-location">—</dd>
+              </div>
+              <div>
+                <dt>Birthday</dt>
+                <dd id="info-birthday">—</dd>
+              </div>
+              <div>
+                <dt>HorseReality link</dt>
+                <dd><a id="info-link" href="#" target="_blank" rel="noopener">Open in new tab</a></dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS TAB -->
+    <section id="stats" class="tab">
+      <h2>Stats</h2>
+      <div id="stats-empty" class="tab-empty">
+        Select a horse from the Stable tab to see its stats.
+      </div>
+
+      <div id="stats-panel" class="stats-panel" hidden>
+        <h3>Genetic Potential (GP)</h3>
+        <table class="stats-table" id="stats-gp-table">
+          <thead>
+            <tr>
+              <th>Stat</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <h3>Conformation</h3>
+        <table class="stats-table" id="stats-confo-table">
+          <thead>
+            <tr>
+              <th>Trait</th>
+              <th>Grade</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <h3>Health</h3>
+        <table class="stats-table" id="stats-health-table">
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COLOUR TAB -->
+    <section id="colour" class="tab">
+      <h2>Colour</h2>
+      <div id="colour-empty" class="tab-empty">
+        Select a horse from the Stable tab to see its colour and genetics.
+      </div>
+
+      <div id="colour-panel" class="colour-panel" hidden>
+        <h3 id="colour-name"></h3>
+        <dl class="colour-fields">
+          <div>
+            <dt>Simplified colour</dt>
+            <dd id="colour-simplified">—</dd>
+          </div>
+          <div>
+            <dt>Extension (E)</dt>
+            <dd id="colour-extension">—</dd>
+          </div>
+          <div>
+            <dt>Agouti (A)</dt>
+            <dd id="colour-agouti">—</dd>
+          </div>
+          <div>
+            <dt>Grey</dt>
+            <dd id="colour-grey">—</dd>
+          </div>
+          <div>
+            <dt>Cream / Pearl</dt>
+            <dd id="colour-cream">—</dd>
+          </div>
+          <div>
+            <dt>Dun</dt>
+            <dd id="colour-dun">—</dd>
+          </div>
+          <div>
+            <dt>MITF / other</dt>
+            <dd id="colour-mitf">—</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- PEDIGREE TAB (placeholder for now) -->
+    <section id="pedigree" class="tab">
+      <h2>Pedigree</h2>
+      <p class="tab-empty">
+        Pedigree view is not built yet. Later this will show a big family tree of your stored horses.
+      </p>
+    </section>
+
+    <!-- CALCULATOR TAB (placeholder for now) -->
+    <section id="calculator" class="tab">
+      <h2>Breeding & Keep/Sell Calculator</h2>
+      <p class="tab-empty">
+        This will later use your horses' stats and the breeding rules to suggest:
+        which mares to pair with which stallions, and which foals to keep or sell.
+      </p>
     </section>
   </main>
 
-  <!-- JS for the webtool (NOT the extension) -->
   <script src="app.js"></script>
 </body>
 </html>
