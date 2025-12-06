@@ -35,10 +35,9 @@ function scrapeHorseBasic() {
   let sex = null;
   let breed = null;
 
-  // Name: try just #name
+  // 1) Try <h1 id="name">
   const nameEl = document.getElementById("name");
   if (nameEl) {
-    // sometimes there is an icon inside; try to grab just the first text node
     const firstNode = nameEl.childNodes[0];
     if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
       name = firstNode.textContent.trim();
@@ -47,25 +46,29 @@ function scrapeHorseBasic() {
     }
   }
 
+  // 2) Fallback: use the page title, like "Sundown Jack - Horse Reality"
+  if (!name && document.title) {
+    const m = document.title.match(/^(.*?)\s*-\s*Horse Reality/i);
+    if (m) {
+      name = m[1].trim();
+    } else {
+      name = document.title.trim();
+    }
+  }
+
   // Sex: <p id="sex"> ... Stallion</p>
   const sexEl = document.getElementById("sex");
   if (sexEl) {
-    // take the full text, then trim
-    sex = sexEl.textContent.trim();
+    sex = sexEl.innerText.trim();
   }
 
   // Breed: <p id="breed">Kathiawari Horse</p>
   const breedEl = document.getElementById("breed");
   if (breedEl) {
-    breed = breedEl.textContent.trim();
+    breed = breedEl.innerText.trim();
   }
 
-  const horse = {
-    id,
-    name,
-    sex,
-    breed
-  };
+  const horse = { id, name, sex, breed };
 
   console.log("EquiSync: scraped horse basic:", horse);
   return horse;
