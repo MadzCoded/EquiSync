@@ -31,57 +31,54 @@ function scrapeHorseBasic() {
   const id = getHorseId();
   if (!id) return null;
 
-  let name = null;
-  let sex = null;
-  let breed = null;
-  let ownerUser = null;
-  let ownerFarm = null;
+  // Start with a minimal object so even if scraping fails, we at least save the ID
+  const horse = {
+    id,
+    name: null,
+    sex: null,
+    breed: null,
+    ownerUser: null,
+    ownerFarm: null
+  };
 
-  // ---------- Name ----------
-  // Try <h1 id="name">
-  const nameEl = document.getElementById("name");
-  if (nameEl) {
-    const firstNode = nameEl.childNodes[0];
-    if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
-      name = firstNode.textContent.trim();
-    } else {
-      name = nameEl.textContent.trim();
+  try {
+    // ---------- Name ----------
+    const nameEl = document.getElementById("name");
+    if (nameEl) {
+      const firstNode = nameEl.childNodes[0];
+      if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
+        horse.name = firstNode.textContent.trim();
+      } else {
+        horse.name = nameEl.textContent.trim();
+      }
     }
-  }
 
-  // Fallback: page title, like "AlleyCat Dunner - Horse Reality"
-  if (!name && document.title) {
-    const m = document.title.match(/^(.*?)\s*-\s*Horse Reality/i);
-    if (m) {
-      name = m[1].trim();
-    } else {
-      name = document.title.trim();
+    // Fallback: page title, like "AlleyCat Dunner - Horse Reality"
+    if (!horse.name && document.title) {
+      const m = document.title.match(/^(.*?)\s*-\s*Horse Reality/i);
+      if (m) {
+        horse.name = m[1].trim();
+      } else {
+        horse.name = document.title.trim();
+      }
     }
-  }
 
-  // ---------- Sex & breed ----------
-  const sexEl = document.getElementById("sex");
-  if (sexEl) {
-    sex = sexEl.innerText.trim();
-  }
+    // ---------- Sex & breed ----------
+    const sexEl = document.getElementById("sex");
+    if (sexEl) {
+      horse.sex = sexEl.innerText.trim();
+    }
 
-  const breedEl = document.getElementById("breed");
-  if (breedEl) {
-    breed = breedEl.innerText.trim();
-  }
+    const breedEl = document.getElementById("breed");
+    if (breedEl) {
+      horse.breed = breedEl.innerText.trim();
+    }
 
-  // ---------- Owner + farm ----------
-  // On your screenshot: "Owner" label in the Info table, with link + farm text.
-  // We'll scan rows in the Info table and look for label "Owner".
-  const infoRoot =
-    document.querySelector("#info") || document.querySelector(".info_table");
+    // ---------- Owner + farm ----------
+    // Look for a table row whose label cell text is "Owner"
+    const infoRows = document.querySelectorAll("#info tr, .info_table_row");
 
-  if (infoRoot) {
-    const rows =
-      infoRoot.querySelectorAll("tr") ||
-      infoRoot.querySelectorAll(".info_table_row");
-
-    rows.forEach((row) => {
+    infoRows.forEach((row) => {
       const labelCell =
         row.querySelector(".info_label") || row.querySelector("td:first-child");
       const valueCell =
@@ -89,31 +86,37 @@ function scrapeHorseBasic() {
 
       if (!labelCell || !valueCell) return;
 
-      const labelText = (labelCell.textContent || "").trim().toLowerCase();
+      const labelText = (labelCell.textContent || "")
+        .trim()
+        .toLowerCase();
+
       if (labelText !== "owner") return;
 
       const fullText = (valueCell.textContent || "").trim();
 
-      // Username is usually a link
-      const a = valueCell.querySelector("a");
-      if (a) {
-        ownerUser = a.textContent.trim();
+      // Username usually is a link
+      const link = valueCell.querySelector("a");
+      if (link) {
+        horse.ownerUser = link.textContent.trim();
       } else if (fullText) {
-        // if no link, use whole value as ownerUser
-        ownerUser = fullText;
+        horse.ownerUser = fullText;
       }
 
-      // Farm name: whatever comes after the username, separated by "·" or "-"
+      // Farm name = whatever comes after the username, separated by "·" or "-"
       // Example: "ThistleHoof - Willowmere Stud"
-      const parts = fullText.split(/[\u00b7-]/).map((s) => s.trim()).filter(Boolean);
+      const parts = fullText
+        .split(/[\u00b7-]/) // middle dot or dash
+        .map((s) => s.trim())
+        .filter(Boolean);
+
       if (parts.length > 1) {
-        // everything after the first piece = farm name
-        ownerFarm = parts.slice(1).join(" - ");
+        horse.ownerFarm = parts.slice(1).join(" - ");
       }
     });
+  } catch (err) {
+    console.error("EquiSync: error while scraping horse:", err);
+    // We still return the partial horse object (at least has id and maybe name)
   }
-
-  const horse = { id, name, sex, breed, ownerUser, ownerFarm };
 
   console.log("EquiSync: scraped horse basic:", horse);
   return horse;
